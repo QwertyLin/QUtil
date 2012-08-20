@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 全局 -->
+    <color name="transparent">#00000000</color><!-- 透明 -->
+    <color name="bg">#FFFFFFFF</color><!-- 背景 -->
+    
+    <color name="text_num_gray">#333</color>
+    <color name="dialog_title_blue">#9CCCF7</color>
+    
+	<color name="white">#FFFFFFFF</color><color name="white_t">#80FFFFFF</color>
+	<color name="black">#FF000000</color><color name="black_t">#80000000</color>
+	<color name="gray0">#FFD1D1D1</color>
+	<color name="gray1">#FFBFBFBF</color><color name="gray1_t">#80BFBFBF</color>
+	<color name="gray2">#FF808080</color><color name="gray2_t">#80808080</color>
+	<color name="gray3">#FF404040</color><color name="gray3_t">#80404040</color>
+	<color name="blue1">#FF6699FF</color>
+	<color name="blue2">#FF3366CC</color>
+	<color name="blue3">#FF003399</color><color name="blue3_t">#80003399</color>
+	<color name="blue4">#FF29AAD6</color>
+	<color name="green1">#FF99CC33</color>
+	<color name="green2">#FF00CC00</color>
+	<color name="green3">#FF669900</color>
+	<color name="orange1">#FFFFCC00</color>
+	<color name="orange2">#FFFF9900</color><color name="orange2_t">#80FF9900</color>
+	<color name="orange3">#FFFF6600</color><color name="orange3_t">#80FF6600</color>
+	<color name="red">#FFFF0000</color>
+	<color name="red1">#FFCC0000</color>
+	<color name="yellow">#FFFFFF00</color>
+</resources>

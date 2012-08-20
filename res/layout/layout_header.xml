@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/frame_title_bar"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/layout_header_bg"
+    android:paddingLeft="5.0dip"
+    android:paddingRight="5.0dip" 
+    android:paddingBottom="5dip" >
+
+    <TextView
+        android:id="@+id/frame_text"
+        android:textSize="18sp"
+        android:textColor="#ffeeeeee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true" 
+        android:text="标题"
+        android:layout_centerInParent="true"
+        />
+
+</RelativeLayout>
