@@ -1,4 +1,4 @@
-package a.manager;
+package q.manager;
 
 import java.util.ArrayList;
 import java.util.List;

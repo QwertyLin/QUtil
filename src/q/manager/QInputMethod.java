@@ -1,4 +1,4 @@
-package a.manager;
+package q.manager;
 
 import android.content.Context;
 import android.view.View;

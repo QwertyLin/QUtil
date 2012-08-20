@@ -1,4 +1,4 @@
-package a.manager;
+package q.manager;
 
 import android.app.Notification;
 import android.app.NotificationManager;

@@ -22,7 +22,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import q.util.a.QLog;
 
 public class QHttp2 {
 	

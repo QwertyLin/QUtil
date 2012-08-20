@@ -2,7 +2,7 @@ package a.util;
 
 import java.io.File;
 
-import q.util.a.QLog;
+import q.util.QLog;
 
 import android.content.Context;
 import android.os.Environment;
