@@ -1,8 +1,19 @@
 package q.util;
 
+import com.umeng.analytics.MobclickAgent;
+
+import android.content.Context;
 import android.util.Log;
 
 public final class QLog {
+	
+	public static void error(Context ctx, String error){
+		MobclickAgent.reportError(ctx, error);
+	}
+	
+	public static void event(){
+		//MobclickAgent.onEvent
+	}
 	
 	public static final void log(String msg){
 		Log.d("Q", msg);
@@ -18,9 +29,5 @@ public final class QLog {
 	
 	public static final void log(StringBuffer sb){
 		Log.d("Q", sb.toString());
-	}
-	
-	public static final void error(Object obj, String msg){
-		Log.d("QQ", obj.getClass().getSimpleName() + " " + msg);
 	}
 }
