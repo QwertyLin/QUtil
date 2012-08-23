@@ -1,4 +1,4 @@
-package a.util;
+package q.util;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,7 +23,8 @@ public class QSqlite extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		Log.i("QSqlite", "onCreate");
 		//可插入多个
-		db.execSQL(Demo.DB_CREATE);
+		//db.execSQL(Demo.DB_CREATE);
+		//db.execSQL(QLayoutOauth.TokenDB.DB_CREATE);
 	}
 
 	//数据库版本号DB_VERSION发生变化时调用
@@ -54,7 +55,7 @@ public class QSqlite extends SQLiteOpenHelper {
 		}
 		
 		// 创建表
-		private static final String DB_CREATE = "CREATE TABLE tableName ("
+		public static final String DB_CREATE = "CREATE TABLE tableName ("
 				+ "id INTEGER PRIMARY KEY," 
 				+ "name TEXT" 
 				+ ")";

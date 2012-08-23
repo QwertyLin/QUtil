@@ -1,4 +1,4 @@
-package q.util.a.view;
+package q.util.view;
 
 import android.app.TabActivity;
 import android.content.Intent;

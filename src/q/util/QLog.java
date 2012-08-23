@@ -8,6 +8,7 @@ import android.util.Log;
 public final class QLog {
 	
 	public static void error(Context ctx, String error){
+		log(error);
 		MobclickAgent.reportError(ctx, error);
 	}
 	

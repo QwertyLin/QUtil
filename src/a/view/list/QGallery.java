@@ -3,7 +3,7 @@ package a.view.list;
 import java.util.ArrayList;
 import java.util.List;
 
-import q.util.a.view.QBaseAdapter;
+import q.util.view.QBaseAdapter;
 
 import android.content.Context;
 import android.view.View;
