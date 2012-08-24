@@ -26,6 +26,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -57,13 +58,15 @@ public class QHttp {
 	
 	private long currentTime = new Date().getTime(); //当前时间，可以接受误差，所以只初始化一次
 		
-	public QHttp(int threadNumber, String cacheDir, long cacheExpire, final Callback callback){
+	public QHttp(Context ctx, int threadNumber, long cacheExpire, final Callback callback){
+		QApp qApp = (QApp)ctx.getApplicationContext();
 		if(threadNumber > 1){
 			this.threadPool = Executors.newFixedThreadPool(threadNumber);
 		}
-		this.cacheDir = cacheDir;
 		this.cacheExpire = cacheExpire;
 		this.callback = callback;
+		//
+		this.cacheDir = qApp.getQFile().get("cache");
 		//
 		this.handler = new Handler(){
 			public void handleMessage(Message msg) {
@@ -114,6 +117,10 @@ public class QHttp {
 		this.checkConnContentLength = bool;
 		log(7);
 	};
+	
+	public String getFilePath(String url){
+		return cacheDir + md5(url);
+	}
 	
 	/**
 	 * 删除缓存

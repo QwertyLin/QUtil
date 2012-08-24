@@ -1,4 +1,4 @@
-package a.util;
+package q.util;
 
 import java.util.List;
 

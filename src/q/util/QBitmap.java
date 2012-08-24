@@ -1,4 +1,4 @@
-package a.util;
+package q.util;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public final class QBitmap {
 	/**
 	 * 将Bitmap编码为byte[]
 	 */
-	public static final byte[] encode(Bitmap bitmap) {
+	public static final byte[] toByte(Bitmap bitmap) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		bitmap.compress(Bitmap.CompressFormat.PNG, 0, baos);
 		return baos.toByteArray();
