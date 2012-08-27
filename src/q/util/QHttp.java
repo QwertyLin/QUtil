@@ -59,7 +59,7 @@ public class QHttp {
 	private long currentTime = new Date().getTime(); //当前时间，可以接受误差，所以只初始化一次
 		
 	public QHttp(Context ctx, int threadNumber, long cacheExpire, final Callback callback){
-		QApp qApp = (QApp)ctx.getApplicationContext();
+		QAppSp qApp = (QAppSp)ctx.getApplicationContext();
 		if(threadNumber > 1){
 			this.threadPool = Executors.newFixedThreadPool(threadNumber);
 		}

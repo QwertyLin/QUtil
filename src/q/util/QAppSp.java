@@ -8,14 +8,12 @@ import q.manager.QWindow;
 import android.app.Activity;
 import android.app.Application;
 
-public class QApp extends Application {
+public abstract class QAppSp extends Application {
 	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		MobclickAgent.onError(this);
-		qWindow = new QWindow(this); 
-		qFile = new QFile(this);
 	}
 
 	//窗口 管理器
@@ -23,6 +21,9 @@ public class QApp extends Application {
 	private QWindow qWindow;
 
 	public QWindow getQWindow() {
+		if(qWindow == null){
+			qWindow = new QWindow(this); 
+		}
 		return qWindow;
 	}
 	
@@ -31,6 +32,9 @@ public class QApp extends Application {
 	private QFile qFile;
 
 	public QFile getQFile() {
+		if(qFile == null){
+			qFile = new QFile(this);
+		}
 		return qFile;
 	}
 	
@@ -38,16 +42,15 @@ public class QApp extends Application {
 	
 	private QActivityCache qActivityCache;
 	
-	public void initQActivityCache(){
-		qActivityCache = new QActivityCache();
+	public QActivityCache getQActivityCache() {
+		if(qActivityCache == null){
+			qActivityCache = new QActivityCache();
+		}
+		return qActivityCache;
 	}
 	
 	public void removeQActivityCache(){
 		qActivityCache = null;
-	}
-	
-	public QActivityCache getQActivityCache() {
-		return qActivityCache;
 	}
 
 	public static class QActivityCache {
