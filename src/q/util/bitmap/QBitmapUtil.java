@@ -1,18 +1,26 @@
-package q.util;
+package q.util.bitmap;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Bitmap.Config;
 import android.graphics.drawable.Drawable;
 
-public final class QBitmap {
-		
+public final class QBitmapUtil {
+	
+	public static final String toString(Bitmap bm){
+		StringBuffer sb = new StringBuffer();
+		sb.append(" config=" + bm.getConfig());
+		sb.append(" width=" + bm.getWidth());
+		sb.append(" height=" + bm.getHeight());
+		sb.append(" density=" + bm.getDensity());
+		sb.append(" rowBytes=" + bm.getRowBytes());
+		return sb.toString();
+	}
+	
+	
 	/**
 	 * 将Drawable转化为Bitmap
 	 */
@@ -75,5 +83,7 @@ public final class QBitmap {
         byte[] array = os.toByteArray();
         return BitmapFactory.decodeByteArray(array, 0, array.length);
 	}
+	
+	
 	
 }

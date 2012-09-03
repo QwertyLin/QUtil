@@ -11,15 +11,6 @@ import android.hardware.Camera;
 
 public final class QToStr {
 
-	public static final String toStr(Bitmap bm){
-		StringBuffer sb = new StringBuffer();
-		sb.append(" config=" + bm.getConfig());
-		sb.append(" width=" + bm.getWidth());
-		sb.append(" height=" + bm.getHeight());
-		sb.append(" density=" + bm.getDensity());
-		sb.append(" rowBytes=" + bm.getRowBytes());
-		return sb.toString();
-	}
 	
 	public static final String toStr(Paint p){
 		StringBuffer sb = new StringBuffer();
