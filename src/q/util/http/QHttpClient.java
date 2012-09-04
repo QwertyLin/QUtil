@@ -1,4 +1,4 @@
-package q.util;
+package q.util.http;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -26,6 +26,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import q.util.QLog;
 import q.util.http.QHttpUtil;
 
 import android.content.Context;
@@ -34,7 +35,7 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 
-public class QHttp {
+public class QHttpClient {
 		
 	private interface Callback{
 		void onError(IOException e);
@@ -60,15 +61,14 @@ public class QHttp {
 	
 	private long currentTime = new Date().getTime(); //当前时间，可以接受误差，所以只初始化一次
 		
-	public QHttp(Context ctx, int threadNumber, long cacheExpire, final Callback callback){
-		QAppSp qApp = (QAppSp)ctx.getApplicationContext();
+	public QHttpClient(Context ctx, int threadNumber, long cacheExpire, final Callback callback){
 		if(threadNumber > 1){
 			this.threadPool = Executors.newFixedThreadPool(threadNumber);
 		}
 		this.cacheExpire = cacheExpire;
 		this.callback = callback;
 		//
-		this.cacheDir = qApp.getQFile().get("cache");
+		this.cacheDir = ctx.getCacheDir().getAbsolutePath() + "/";
 		//
 		this.handler = new Handler(){
 			public void handleMessage(Message msg) {
