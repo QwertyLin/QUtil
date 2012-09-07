@@ -1,135 +1,137 @@
 package q.util.http;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
 import q.util.QLog;
-import q.util.http.QHttpUtil;
-
+import q.util.QStreamUtil;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 
+/**
+ * 带缓存与线程池的http请求
+ *
+ */
 public class QHttpClient {
-		
-	private interface Callback{
-		void onError(IOException e);
-	}
-	public interface CallbackString extends Callback {
-		void onCompleted(String str);
-	}
-	public interface CallbackStream extends Callback {
-		void onCompleted(InputStream stream);
-	}
-	public interface CallbackBitmap extends Callback {
-		void onCompleted(Bitmap bm);
-	}
-	public interface CallbackBitmapList extends Callback {
-		void onCompleted(Bitmap bm, String tag);
-	}
 	
-	private ExecutorService threadPool;//线程池，不为空表建立线程池
-	private String cacheDir; //必须以"/"结尾，不为空表读取缓存
-	private long cacheExpire; //单位为分钟min
-	private boolean checkConnContentLength;
-	private Callback callback; private Handler handler;
-	
-	private long currentTime = new Date().getTime(); //当前时间，可以接受误差，所以只初始化一次
+	private static abstract class Callback {
 		
-	public QHttpClient(Context ctx, int threadNumber, long cacheExpire, final Callback callback){
-		if(threadNumber > 1){
-			this.threadPool = Executors.newFixedThreadPool(threadNumber);
+		public enum TYPE {
+			FILE, TEXT, BITMAP;
 		}
-		this.cacheExpire = cacheExpire;
-		this.callback = callback;
-		//
-		this.cacheDir = ctx.getCacheDir().getAbsolutePath() + "/";
-		//
-		this.handler = new Handler(){
+		
+		class Holder {
+			String url;
+			Object obj;
+		}
+		
+		public Handler handler = new Handler(){
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case 0:
-					try {
-						if(msg.arg1 == 0){
-							initCallback(callback, (String)msg.obj, null);
-						}else{
-							initCallback(callback, (String)msg.obj, msg.getData().getString("tag"));
-						}
-					} catch (IOException e) {
-						callback.onError(e);
+					Holder h = (Holder)msg.obj;
+					switch(getReturnType()){
+					case FILE:
+					case TEXT:
+						onCompleted((String)h.obj, h.url);
+						break;
 					}
 					break;
 				case 1:
-					callback.onError((IOException)msg.obj);
+					onError((IOException)msg.obj);
 					break;
 				}
 			};
-		};
+		};	
+		
+		protected void success(String file, String url){
+			Holder h = new Holder();
+			h.url = url;
+			switch(getReturnType()){
+			case FILE:
+				h.obj = file;
+				break;
+			case TEXT:
+				try {
+					h.obj = QStreamUtil.toStr(new FileInputStream(file));
+				} catch (IOException e) {
+					e.printStackTrace();
+					error(e);
+				}
+				break;
+			}
+			Message msg = handler.obtainMessage();
+			msg.what = 0;
+			msg.obj = h;
+			handler.sendMessage(msg);
+		}
+		
+		void error(IOException e){
+			Message msg = handler.obtainMessage();
+			msg.what = 1;
+			msg.obj = e;
+			handler.sendMessage(msg);
+		}
+		
+		public abstract TYPE getReturnType();
+		public abstract void onCompleted(String str, String url);
+		public abstract void onCompleted(Bitmap bm, String url);
+		public abstract void onError(IOException e);
+	}
+	
+	public static abstract class CallbackFile extends Callback {
+		public abstract void onCompleted(String file, String url);
+		@Override
+		public TYPE getReturnType() {return TYPE.FILE;}
+		@Override
+		public void onCompleted(Bitmap bm, String url) {return;}
+	}
+	
+	public static abstract class CallbackText extends Callback {
+		public abstract void onCompleted(String text, String url);
+		@Override
+		public TYPE getReturnType() {return TYPE.TEXT;}
+		@Override
+		public void onCompleted(Bitmap bm, String url) {return;}
+	}
+	
+	public static abstract class CallbackBitmap extends Callback {
+		@Override
+		public TYPE getReturnType() {return TYPE.BITMAP;}
+		@Override
+		public void onCompleted(String str, String url) {return;}
+	}
+	
+	
+	
+	private ExecutorService threadPool;//线程池，不为空表建立线程池
+	private String cacheDir; //必须以"/"结尾，不为空表读取缓存
+	private boolean checkExist;
+		
+	/**
+	 * @param ctx
+	 * @param threadNumber 线程池容量
+	 * @param cacheExpire 缓存过期时间，单位为分钟
+	 */
+	public QHttpClient(Context ctx, int threadNumber, long cacheExpire){
+		if(threadNumber > 1){
+			this.threadPool = Executors.newFixedThreadPool(threadNumber);
+		}
+		this.cacheDir = ctx.getCacheDir().getAbsolutePath() + "/";
 		//
 		log(1);
-	}
-	
-	private void initCallback(Callback callback, String file, String tag) throws IOException{
-		if(callback instanceof CallbackString){
-			((CallbackString)callback).onCompleted(streamToString(new FileInputStream(file)));
-		}else if(callback instanceof CallbackBitmapList){
-			((CallbackBitmapList)callback).onCompleted(BitmapFactory.decodeFile(file), tag);
-		}else if(callback instanceof CallbackBitmap){
-			((CallbackBitmap)callback).onCompleted(BitmapFactory.decodeFile(file));
-		}else if(callback instanceof CallbackStream){
-			((CallbackStream)callback).onCompleted(new FileInputStream(file));
-		}
-	}
-	
-	public long getCacheExpire(){
-		return this.cacheExpire;
-	}
-	
-	public void setCacheExpire(long cacheExpire){
-		this.cacheExpire = cacheExpire;
-		log(2);
-	}
-	
-	public void setCheckConnContentLength(boolean bool){
-		this.checkConnContentLength = bool;
-		log(7);
-	};
-	
-	public String getFilePath(String url){
-		return cacheDir + md5(url);
-	}
-	
-	/**
-	 * 删除缓存
-	 */
-	public final void deleteCache(String url){
-		new File(cacheDir + md5(url)).delete();
-		log(5, url);
 	}
 	
 	private void run(Runnable run){
@@ -140,142 +142,61 @@ public class QHttpClient {
     	}
 	}
 	
-	private boolean checkCache(File cacheFile){
+	private boolean checkCache(File cacheFile, long cacheExpire){
 		//缓存，如果读取本地缓存，则不开线程请求网络
-		if(cacheExpire != 0 && cacheFile.exists() && cacheExpire * 60 * 1000 > this.currentTime - cacheFile.lastModified()){
+		if(cacheExpire != 0 && cacheFile.exists() && cacheExpire > new Date().getTime() - cacheFile.lastModified()){
 			log(3);
 			return true;
     	}
 		log(4);
 		return false;
 	}
-	
-    public void  get(final String urlStr){    	
-    	get(urlStr, null);
-    }
     
-    public void  get(final String urlStr, final String tag){    	
-    	final File cacheFile = new File(cacheDir + md5(urlStr));
-    	log(6, urlStr, cacheFile);
+    public void get(final String url, long cacheTime, final Callback callback){    	
+    	final File cacheFile = new File(cacheDir + md5(url));
+    	log(6, url, cacheFile);
     	//
-    	if(checkCache(cacheFile)){
-    		if(tag == null){
-    			try {
-        			initCallback(callback, cacheFile.getPath(), tag);
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    				callback.onError(e);
-    			}
-    		}else{ //列表要稍微延迟一会，否则findViewWithTag会找不到
-    			Message msg = handler.obtainMessage();
-				msg.obj = cacheFile.getPath();
-				msg.arg1 = 1;
-				msg.getData().putString("tag", tag);
-				handler.sendMessage(msg);
-    		}
+    	if(checkCache(cacheFile, cacheTime)){
+    		callback.success(cacheFile.getAbsolutePath(), url);
     		return;
     	}
     	//
     	run(new Runnable() {
 			@Override
 			public void run() {
-				Message msg = handler.obtainMessage();
-				//
-				/*if(checkCache(cacheFile)){
-					msg.obj = cacheFile.getPath();
-					msg.arg1 = tag;
-					handler.sendMessage(msg);
-		    		return;
-		    	}*/
-				//
+				SystemClock.sleep(2000);
 				try {
-					getFile(urlStr, cacheFile);
-					msg.obj = cacheFile.getPath();
-					if(tag != null){
-						msg.arg1 = 1;
-						msg.getData().putString("tag", tag);
-					}
-					msg.what = 0;
+					QHttpClientSimple.getFile(url, cacheFile.getAbsolutePath(), checkExist);
+					callback.success(cacheFile.getAbsolutePath(), url);
 				} catch (IOException e) {
 					e.printStackTrace();
-					msg.what = 1;
-					msg.obj = e;
-				} finally{
-					handler.sendMessage(msg);
+					callback.error(e);
 				}
 			}
 		});
     }
-    
-    /**
-     * 发送HTTP GET请求
-     * @param urlStr 如 http://www.baidu.com/
-     * @param charset "UTF-8"或"GBK"
-     * @return
-     * @throws IOException
-     */
-    public void getFile(String urlStr, File saveFile) throws IOException {
-		URL url = new URL(urlStr);
-		HttpURLConnection conn = null;
-		if (url.getProtocol().toLowerCase().equals("http")){
-			conn = (HttpURLConnection) url.openConnection();
-		}else if(url.getProtocol().toLowerCase().equals("https")){
-			conn = getHttpsConnection(url);
-		}
-		//
-		conn.setRequestMethod("GET");
-		QLog.log(QHttpUtil.toString(conn));
-		//
-		if(conn.getResponseCode() == 200){
-			//文件大小不变时,不更新
-			if(this.checkConnContentLength && saveFile.exists() && saveFile.length() == conn.getContentLength()){
-				QLog.log("文件无变化");
-				return;
-			}
-			File temp = new File(saveFile.getAbsoluteFile() + ".temp");
-			try {
-				InputStream in = conn.getInputStream();
-				FileOutputStream out = new FileOutputStream(temp);
-				byte[] buffer = new byte[1024];
-		        int len = 0;		        
-		        while((len = in.read(buffer)) != -1){
-		        	out.write(buffer, 0, len);
-				}
-		        //
-		       /* if(true){
-				throw new IOException();
-		        }*/
-		        if(!temp.renameTo(saveFile)){
-					throw new IOException();
-				}
-		        //
-		        in.close();
-		        out.close();
-			} catch (IOException e) {
-				throw e;
-			} finally {
-				if (conn != null)
-					conn.disconnect();
-			}
-		}else{
-			throw new IOException();
-		}
+	
+	public void setCheckExist(boolean bool){
+		this.checkExist = bool;
+		log(7);
+	};
+	
+	/**
+	 * 删除缓存
+	 */
+	public final void deleteCache(String url){
+		new File(cacheDir + md5(url)).delete();
+		log(5, url);
 	}
-    
-    private final String streamToString(InputStream is) throws IOException {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		byte[] buf = new byte[4096];
-		int ret = 0;
-		while ((ret = is.read(buf)) > 0) {
-			os.write(buf, 0, ret);
-		}
-		return new String(os.toByteArray());
+	
+	public String getFilePath(String url){
+		return cacheDir + md5(url);
 	}
     
     /**
 	 * MD5编码，如果不支持该编码则返回原始字符
 	 */
-	public String md5(String str) {
+	private String md5(String str) {
 		MessageDigest md = null;
 		try {
 			md = MessageDigest.getInstance("MD5");
@@ -315,10 +236,6 @@ public class QHttpClient {
     		}else{
     			sb.append(" 缓存文件夹=" + cacheDir);
     		}
-    		sb.append(" 缓存有效时间=" + cacheExpire + "分钟");
-    		break;
-    	case 2: 
-    		sb.append(" 修改缓存时间为=" + cacheExpire + "分钟");
     		break;
     	case 3: 
     		sb.append(" 缓存有效");
@@ -341,66 +258,5 @@ public class QHttpClient {
     	}
     	QLog.log(sb.toString());
     }
-	
-	protected void Q(){}
-    
-    public static InputStream staticGetStream(String urlStr) throws IOException {
-		URL url = new URL(urlStr);
-		HttpURLConnection conn = null;
-		if (url.getProtocol().toLowerCase().equals("http")){
-			conn = (HttpURLConnection) url.openConnection();
-		}else if(url.getProtocol().toLowerCase().equals("https")){
-			conn = getHttpsConnection(url);
-		}
-		conn.setRequestMethod("GET");
-		//
-		if(conn.getResponseCode() == 200){
-			try {
-				return conn.getInputStream();
-			} catch (IOException e) {
-				throw e;
-			} finally {
-				if (conn != null)
-					conn.disconnect();
-			}
-		}else{
-			throw new IOException();
-		}
-	}
-    
-    
-    
-    public static HttpsURLConnection getHttpsConnection(URL url) throws IOException {
-		// Create a trust manager that does not validate certificate chains
-		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-				return new java.security.cert.X509Certificate[] {};
-			}
-
-			public void checkClientTrusted(X509Certificate[] chain,
-					String authType) throws CertificateException {
-			}
-
-			public void checkServerTrusted(X509Certificate[] chain,
-					String authType) throws CertificateException {
-			}
-		} };
-		// Install the all-trusting trust manager
-		try {
-			SSLContext sc = SSLContext.getInstance("TLS");
-			sc.init(null, trustAllCerts, new java.security.SecureRandom());
-			HttpsURLConnection
-					.setDefaultSSLSocketFactory(sc.getSocketFactory());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
-	    https.setHostnameVerifier(new HostnameVerifier() {
-			public boolean verify(String hostname, SSLSession session) {
-				return true;
-			}
-		});
-	    return https;
-	}
     
 }

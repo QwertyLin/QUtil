@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -89,6 +90,16 @@ public class QHttpClientSimple {
 	}
     
     public static void getFile(String urlStr, String file) throws IOException {
+    	getFile(urlStr, file, false);
+    }
+    
+    /**
+     * @param urlStr
+     * @param filePath
+     * @param checkExist 检测已存在的文件跟远程文件是否大小一样
+     * @throws IOException
+     */
+    public static void getFile(String urlStr, String filePath, boolean checkExist) throws IOException {
     	HttpURLConnection conn = null;
     	InputStream in = null;
     	FileOutputStream out = null;
@@ -103,16 +114,23 @@ public class QHttpClientSimple {
 			conn.setRequestMethod("GET");
 			QLog.log(QHttpUtil.toString(conn));
 			//
+			File file = new File(filePath);
 			if(conn.getResponseCode() == 200){
+				//文件大小不变时,不更新
+				if(checkExist && file.exists() && file.length() == conn.getContentLength()){
+					QLog.log("文件无变化");
+					return;
+				}
+				//
 				in = conn.getInputStream();
-				File temp = new File(file + ".temp");
+				File temp = new File(filePath + ".temp");
 				out = new FileOutputStream(temp);
 				byte[] buffer = new byte[1024];
 		        int len = 0;		        
 		        while((len = in.read(buffer)) != -1){
 		        	out.write(buffer, 0, len);
 				}
-		        if(temp.length() == 0 || !temp.renameTo(new File(file))){
+		        if(temp.length() == 0 || !temp.renameTo(file)){
 					throw new IOException();
 				}
 			}else{

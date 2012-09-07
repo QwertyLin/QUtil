@@ -26,7 +26,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import q.util.http.QHttpUtil;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -224,7 +223,7 @@ public class QHttp {
 		}
 		//
 		conn.setRequestMethod("GET");
-		QLog.log(QHttpUtil.toString(conn));
+		//QLog.log(QHttpUtil.toString(conn));
 		//
 		if(conn.getResponseCode() == 200){
 			//文件大小不变时,不更新

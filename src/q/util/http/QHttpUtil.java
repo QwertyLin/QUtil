@@ -1,6 +1,7 @@
 package q.util.http;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,5 +43,6 @@ public class QHttpUtil {
 		//System.out.println("userInfo:"+conn.getURL().getUserInfo());
     }
 
+	
 	
 }
