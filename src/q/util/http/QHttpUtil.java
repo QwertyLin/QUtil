@@ -113,7 +113,7 @@ public class QHttpUtil {
 	}
     
     public static void getFile(String urlStr, String file) throws IOException {
-    	getFile(urlStr, file, false);
+    	getFile(urlStr, new File(file), false);
     }
     
     /**
@@ -122,7 +122,7 @@ public class QHttpUtil {
      * @param checkExist 检测已存在的文件跟远程文件是否大小一样
      * @throws IOException
      */
-    public static void getFile(String urlStr, String filePath, boolean checkExist) throws IOException {
+    public static void getFile(String urlStr, File file, boolean checkExist) throws IOException {
     	HttpURLConnection conn = null;
     	InputStream in = null;
     	FileOutputStream out = null;
@@ -137,7 +137,6 @@ public class QHttpUtil {
 			conn.setRequestMethod("GET");
 			QLog.log(QHttpUtil.toString(conn));
 			//
-			File file = new File(filePath);
 			if(conn.getResponseCode() == 200){
 				//文件大小不变时,不更新
 				if(checkExist && file.exists() && file.length() == conn.getContentLength()){
@@ -146,7 +145,7 @@ public class QHttpUtil {
 				}
 				//
 				in = conn.getInputStream();
-				File temp = new File(filePath + ".temp");
+				File temp = new File(file.getPath() + ".temp");
 				out = new FileOutputStream(temp);
 				byte[] buffer = new byte[1024];
 		        int len = 0;		        

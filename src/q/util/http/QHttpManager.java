@@ -47,10 +47,9 @@ public class QHttpManager {
 		QLog.kv(this, "init", "cacheDir", cacheDir);
 	}
 	
-	private boolean checkCache(String cacheFile, long cacheExpire){
+	private boolean checkCache(File cacheFile, long cacheExpire){
 		//缓存，如果读取本地缓存，则不开线程请求网络
-		File file = new File(cacheFile);
-		if(cacheExpire != 0 && file.exists() && cacheExpire > new Date().getTime() - file.lastModified()){
+		if(cacheExpire != 0 && cacheFile.exists() && cacheExpire > new Date().getTime() - cacheFile.lastModified()){
 			QLog.kv(this, "checkCache", "cache available", true);
 			return true;
     	}
@@ -66,9 +65,9 @@ public class QHttpManager {
      */
     public void get(final String url, final Callback callback){    	
     	
-    	final String cacheFile = (callback.getCacheFile() == null) ? cacheDir + QCodeUtil.md5(url) : callback.getCacheFile();
+    	final File cacheFile = (callback.getCacheFile() == null) ? new File(cacheDir + QCodeUtil.md5(url)) : new File(callback.getCacheFile());
     	QLog.kv(this, "get", "remote", url);
-    	QLog.kv(this, "get", "local", cacheFile);
+    	QLog.kv(this, "get", "local", cacheFile.getPath());
     	//
     	if(checkCache(cacheFile, callback.getCacheTime())){
     		callback.success(cacheFile, url);
@@ -84,7 +83,7 @@ public class QHttpManager {
 					callback.success(cacheFile, url);
 				} catch (IOException e) {
 					e.printStackTrace();
-					callback.error(e);
+					callback.error();
 				}
 			}
 		});
@@ -105,16 +104,16 @@ public class QHttpManager {
 	
 	private static abstract class Callback {
 		
-		public enum TYPE {
+		protected enum TYPE {
 			FILE, TEXT, BITMAP;
 		}
 		
-		class Holder {
+		private class Holder {
 			String url;
 			Object obj;
 		}
 		
-		public Handler handler = new Handler(){
+		private Handler handler = new Handler(){
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case 0:
@@ -127,25 +126,36 @@ public class QHttpManager {
 					}
 					break;
 				case 1:
-					onError((IOException)msg.obj);
+					onError();
 					break;
 				}
 			};
 		};	
 		
-		protected void success(String file, String url){
+		protected void success(File file, String url){
 			Holder h = new Holder();
 			h.url = url;
 			switch(getReturnType()){
 			case FILE:
-				h.obj = file;
+				if(verify(file)){
+					h.obj = file.getPath();
+				}else{
+					file.delete();
+					error();
+				}
 				break;
 			case TEXT:
 				try {
-					h.obj = QStreamUtil.toStr(new FileInputStream(file));
+					String text = QStreamUtil.toStr(new FileInputStream(file));
+					if(verify(text)){
+						h.obj = text;
+					}else{
+						file.delete();
+						error();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
-					error(e);
+					error();
 				}
 				break;
 			}
@@ -155,14 +165,13 @@ public class QHttpManager {
 			handler.sendMessage(msg);
 		}
 		
-		void error(IOException e){
+		void error(){
 			Message msg = handler.obtainMessage();
 			msg.what = 1;
-			msg.obj = e;
 			handler.sendMessage(msg);
 		}
 		
-		public abstract TYPE getReturnType();
+		protected abstract TYPE getReturnType();
 		/**
 		 * 缓存时间，单位毫秒
 		 */
@@ -176,32 +185,38 @@ public class QHttpManager {
 		 * 是否检测比较文件大小
 		 */
 		protected abstract boolean checkExist();
-		public abstract void onCompleted(String str, String url);
-		public abstract void onCompleted(Bitmap bm, String url);
-		public abstract void onError(IOException e);
+		protected abstract boolean verify(String text);
+		protected abstract boolean verify(File file);
+		protected abstract void onCompleted(String str, String url);
+		protected abstract void onCompleted(Bitmap bm, String url);
+		protected abstract void onError();
 	}
 	
 	public static abstract class CallbackFile extends Callback {
-		public abstract void onCompleted(String file, String url);
+		protected abstract void onCompleted(String file, String url);
 		@Override
-		public TYPE getReturnType() {return TYPE.FILE;}
+		protected TYPE getReturnType() {return TYPE.FILE;}
 		@Override
-		public void onCompleted(Bitmap bm, String url) {return;}
+		protected boolean verify(String text) {return true;};
+		@Override
+		protected void onCompleted(Bitmap bm, String url) {return;}
 	}
 	
 	public static abstract class CallbackText extends Callback {
-		public abstract void onCompleted(String text, String url);
+		protected abstract void onCompleted(String text, String url);
 		@Override
-		public TYPE getReturnType() {return TYPE.TEXT;}
+		protected TYPE getReturnType() {return TYPE.TEXT;}
 		@Override
-		public void onCompleted(Bitmap bm, String url) {return;}
+		protected boolean verify(File file) {return true;};
+		@Override
+		protected void onCompleted(Bitmap bm, String url) {return;}
 	}
 	
 	public static abstract class CallbackBitmap extends Callback {
 		@Override
-		public TYPE getReturnType() {return TYPE.BITMAP;}
+		protected TYPE getReturnType() {return TYPE.BITMAP;}
 		@Override
-		public void onCompleted(String str, String url) {return;}
+		protected void onCompleted(String str, String url) {return;}
 	}
     
 }

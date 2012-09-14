@@ -30,10 +30,12 @@ public class QWindowManager {
 	private float scaleRes;//资源缩放倍数，以480x320为一倍
 	private float scaleText;//字体缩放倍数，以480x320为一倍
 	
+	
 	public void init(Context ctx){
 		DisplayMetrics dm = new DisplayMetrics(); 
 		((WindowManager)ctx.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(dm);
 		//
+		
 		width = dm.widthPixels;
 		height = dm.heightPixels;
 		if(width > height) {//高度大于宽度
