@@ -1,4 +1,4 @@
-package q.manager;
+package q.util.os;
 
 import android.content.Context;
 import android.view.View;
@@ -7,7 +7,7 @@ import android.view.inputmethod.InputMethodManager;
 /**
  * 输入法
  */
-public class QInputMethod {
+public class QInputMethodUtil {
 
 	/**
 	 * @param v EditText类View

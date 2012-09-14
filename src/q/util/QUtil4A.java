@@ -49,17 +49,6 @@ public final class QUtil4A {
 		act.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); 
 	}
 	
-	//================================= 操作系统，OS ===================================================
-	protected void Os(){}
-	
-	/**
-	 * 获得手机型号
-	 */
-	public static final String Os_getModel () {
-		Build bd = new Build();
-		return bd.MODEL;
-	}
-	
 	//======================================= TextView =========================================
 	protected void TextView(){}
 	

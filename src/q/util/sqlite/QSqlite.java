@@ -1,4 +1,4 @@
-package q.util;
+package q.util.sqlite;
 
 import android.content.ContentValues;
 import android.content.Context;

@@ -1,13 +1,12 @@
-package q.manager;
+package q.util.os;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 
-public class QPackage {
+public class QPackageUtil {
 
 	public static List<PackageInfo> list(Context ctx){
 		List<PackageInfo> temp = ctx.getPackageManager().getInstalledPackages(0);

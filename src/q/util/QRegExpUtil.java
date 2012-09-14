@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * 正则表达式
  *
  */
-public class QRegExp {
+public class QRegExpUtil {
 
 	/**
 	 * 匹配多个#abc#

@@ -115,19 +115,6 @@ public final class QUtil {
 		}
 		return false;
 	}
-	
-	//============================== Stream ============================================
-	protected void Stream(){}
-	
-	public static final String Stream_readInputStream(InputStream is) throws IOException {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		byte[] buf = new byte[4096];
-		int ret = 0;
-		while ((ret = is.read(buf)) > 0) {
-			os.write(buf, 0, ret);
-		}
-		return new String(os.toByteArray());
-	}
 		
     //===================================== Math ==============================================
     protected void Math(){};

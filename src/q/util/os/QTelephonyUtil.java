@@ -1,4 +1,4 @@
-package q.manager;
+package q.util.os;
 
 import java.io.IOException;
 import java.util.List;
@@ -7,17 +7,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import q.util.QHttp2;
+import q.util.http.QHttpUtil;
 import android.content.Context;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 
-public class QTelephony {
+public class QTelephonyUtil {
 
 	//http://code.google.com/p/gears/wiki/GeolocationAPI
-	private String googleGeolocation(Context ctx) throws JSONException, IOException {
+	public String googleGeolocation(Context ctx) throws JSONException, IOException {
 		TelephonyManager tm = (TelephonyManager) ctx
 				.getSystemService(Context.TELEPHONY_SERVICE);
 		//
@@ -107,6 +107,6 @@ public class QTelephony {
 		}
 		//
 		System.out.println(json.toString());
-		return QHttp2.post("http://www.google.com/loc/json", json.toString());
+		return QHttpUtil.post("http://www.google.com/loc/json", json.toString());
 	}
 }
