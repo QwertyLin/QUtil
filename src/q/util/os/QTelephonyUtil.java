@@ -108,6 +108,6 @@ public class QTelephonyUtil {
 		}
 		//
 		System.out.println(json.toString());
-		return QUtil.http.post("http://www.google.com/loc/json", json.toString());
+		return QUtil.http.util.post("http://www.google.com/loc/json", json.toString());
 	}
 }

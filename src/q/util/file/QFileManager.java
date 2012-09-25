@@ -3,6 +3,7 @@ package q.util.file;
 import java.io.File;
 
 import q.util.QLog;
+import q.util.QUtil;
 
 import android.content.Context;
 import android.os.Environment;
@@ -44,7 +45,7 @@ public class QFileManager {
 		if(!file.exists()){
 			file.mkdirs();
 		}
-		QLog.kv(this, "init", "root", nRoot);
+		QUtil.log.kv(this, "init", "root", nRoot);
 	}
 	
 	public String get(String dir){

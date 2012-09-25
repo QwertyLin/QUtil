@@ -1,6 +1,7 @@
 package q.util.os;
 
 import q.util.QLog;
+import q.util.QUtil;
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
@@ -43,14 +44,14 @@ public class QWindowManager {
 			nWidth = nHeight;
 			nHeight = temp;
 		}
-		QLog.kv(this, "init", "width", nWidth);
-		QLog.kv(this, "init", "height", nHeight);
+		QUtil.log.kv(this, "init", "width", nWidth);
+		QUtil.log.kv(this, "init", "height", nHeight);
 		//
 		nDpi = dm.densityDpi;
-		QLog.kv(this, "init", "dpi", nDpi);
+		QUtil.log.kv(this, "init", "dpi", nDpi);
 		//
 		nScale = (float)(nWidth / 320.0);//以480x320为一倍
-		QLog.kv(this, "init", "scale", nScale);
+		QUtil.log.kv(this, "init", "scale", nScale);
 		//	
 		if (nDpi < 130) {
 			nScaleRes = 0.75f;

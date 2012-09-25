@@ -63,7 +63,7 @@ public class QBitmapFilter {
 		paint.setXfermode(new PorterDuffXfermode(Mode.DST_IN));
 		canvas.drawRect(0, height, width, newBm.getHeight() + gap, paint);
 		//
-		QUtil.bitmap.recycle(reflection);
+		QUtil.bitmap.util.recycle(reflection);
 		return newBm;
 	}
 	

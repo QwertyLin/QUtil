@@ -74,7 +74,7 @@ public class QHttpUtil {
 			//
 			conn.connect();
 			conn.setRequestMethod("GET");
-			QLog.log(QUtil.http.toString(conn));
+			QUtil.log.log(QHttpUtil.class, QUtil.http.util.toString(conn));
 			//
 			//Header
 			//urlConnection.setRequestProperty("Host", "www.baidu.com");
@@ -137,7 +137,7 @@ public class QHttpUtil {
 			}
 			//
 			conn.setRequestMethod("GET");
-			QLog.log(QUtil.http.toString(conn));
+			QUtil.log.log(QHttpUtil.class, QUtil.http.util.toString(conn));
 			//
 			if(conn.getResponseCode() == 200){
 				//文件大小不变时,不更新
@@ -244,7 +244,7 @@ public class QHttpUtil {
 				}
 			}
 			//
-			QUtil.http.toString(conn);
+			QUtil.http.util.toString(conn);
 			//
 			if(conn.getResponseCode() == 200){
 				StringBuffer temp = new StringBuffer();
