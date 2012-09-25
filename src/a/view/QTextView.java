@@ -38,7 +38,7 @@ public class QTextView {
 	/**
 	 * 带超链接的HTML化
 	 * 
-	 * @param ctx
+	 * @param mCtx
 	 * @param tv
 	 * @param anchorColor 超链接颜色
 	 * @param isAnchorUnderline 超链接是否带下划线

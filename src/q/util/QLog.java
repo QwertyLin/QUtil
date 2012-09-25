@@ -5,7 +5,7 @@ import com.umeng.analytics.MobclickAgent;
 import android.content.Context;
 import android.util.Log;
 
-public final class QLog {
+public class QLog {
 	
 	private static boolean available = true;
 	

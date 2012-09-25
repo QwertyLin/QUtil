@@ -20,9 +20,11 @@ import q.util.thread.QThreadManager;
 
 public final class QUtil {
 	
-	/* Activity 活动 */
+	public static class log extends QLog{}
 	
-	public static QActivityManager activityManager(){
+	/* Activity */
+	
+	public static QActivityManager activityM(){
 		return QActivityManager.getInstance();
 	}
 	
@@ -36,49 +38,49 @@ public final class QUtil {
 	
 	public static class bitmapFilterMatrix extends QBitmapFilterMatrix{}
 	
-	public static QBitmapManager bitmapManager(){
+	public static QBitmapManager bitmapM(){
 		return QBitmapManager.getInstance();
 	}
 	
-	public static class bitmapUtil extends QBitmapUtil{}
+	public static class bitmap extends QBitmapUtil{}
 	
 	/* Code 编码 */
 	
-	public static class codeUtil extends QCodeUtil{}
+	public static class code extends QCodeUtil{}
 	
 	/* File 文件*/
 	
-	public static QFileManager fileManager(Context ctx){
+	public static QFileManager fileM(Context ctx){
 		return QFileManager.getInstance(ctx);
 	}
 	
 	/* HTTP 网络 */
 	
-	public static QHttpManager httpManager(Context ctx){
+	public static QHttpManager httpM(Context ctx){
 		return QHttpManager.getInstance(ctx);
 	}
 	
-	public static class httpUtil extends QHttpUtil{}
+	public static class http extends QHttpUtil{}
 	
 	/* Intent */
 	
-	public static class intentUtil extends QIntentUtil{}
+	public static class intent extends QIntentUtil{}
 	
 	/* OS 系统 */
 	
-	public static QWindowManager windowManager(Context ctx){
+	public static QWindowManager windowM(Context ctx){
 		return QWindowManager.getInstance(ctx);
 	}
 	
-	public static class windowUtil extends QWindowUtil{}
+	public static class window extends QWindowUtil{}
 	
 	/* Stream 数据流 */
 	
-	public static class streamUtil extends QStreamUtil{}
+	public static class stream extends QStreamUtil{}
 	
 	/* Thread 线程 */
 	
-	public static QThreadManager threadManager(){
+	public static QThreadManager threadM(){
 		return QThreadManager.getInstance();
 	}
 	

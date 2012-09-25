@@ -1,5 +1,6 @@
 package q.util.bitmap;
 
+import q.util.QUtil;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
@@ -62,7 +63,7 @@ public class QBitmapFilter {
 		paint.setXfermode(new PorterDuffXfermode(Mode.DST_IN));
 		canvas.drawRect(0, height, width, newBm.getHeight() + gap, paint);
 		//
-		QBitmapUtil.recycle(reflection);
+		QUtil.bitmap.recycle(reflection);
 		return newBm;
 	}
 	

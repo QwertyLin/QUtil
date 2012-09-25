@@ -12,10 +12,6 @@ import q.util.http.QHttpManager;
 
 public final class QUtil2 {
 	
-	public static final QHttpManager getHttpManager(Context ctx){
-		return QHttpManager.getInstance(ctx);
-	}
-	
 	//=============================== 日期类 =====================================
 	protected void Date(){}
 	

@@ -3,7 +3,8 @@ package a.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import q.util.view.QBaseAdapter;
+import q.view.QView;
+import q.view.adapter.QBaseAdapter;
 
 import android.content.Context;
 import android.view.View;
@@ -17,7 +18,7 @@ public class QGallery<T> extends Gallery {
 		setAdapter(new Adapter(ctx, data));
 	}
 	
-	private class Adapter extends QBaseAdapter<T>{
+	private class Adapter extends QView.adapter<T>{
 
 		public Adapter(Context ctx, ArrayList<T> data) {
 			super(ctx, data);

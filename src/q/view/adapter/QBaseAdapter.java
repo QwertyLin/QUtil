@@ -1,4 +1,4 @@
-package q.util.view;
+package q.view.adapter;
 
 import java.util.List;
 
@@ -11,24 +11,24 @@ import android.widget.BaseAdapter;
 
 public abstract class  QBaseAdapter<T> extends BaseAdapter {
 	
-	protected List<T> datas;
-	protected Context ctx;
-	protected LayoutInflater inflater;
+	protected List<T> mDatas;
+	protected Context mCtx;
+	protected LayoutInflater mInflater;
 	
 	public QBaseAdapter(Context ctx, List<T> datas) {
-		this.ctx = ctx;
-		this.datas =  datas;
-		this.inflater = ((Activity)ctx).getLayoutInflater();
+		this.mCtx = ctx;
+		this.mDatas =  datas;
+		this.mInflater = ((Activity)ctx).getLayoutInflater();
 	}
 
 	@Override
 	public int getCount() {
-		return datas.size();
+		return mDatas.size();
 	}
 
 	@Override
 	public T getItem(int position) {
-		return datas.get(position);
+		return mDatas.get(position);
 	}
 
 	@Override
@@ -40,13 +40,13 @@ public abstract class  QBaseAdapter<T> extends BaseAdapter {
 	public View getView(int position, View v, ViewGroup parent) {
 		Object h = null;
 		if(v == null){
-			v = inflater.inflate(getLayoutId(), null);
+			v = mInflater.inflate(getLayoutId(), null);
 			h = getViewHolder(v);
 			v.setTag(h);
 		}else{
 			h = v.getTag();
 		}
-		onInitItem(position, datas.get(position), h);
+		onInitItem(position, mDatas.get(position), h);
 		return v;
 	}
 	
