@@ -71,6 +71,7 @@ public class QHttpUtil {
 				conn = initHttpsConn(url);
 			}
 			//
+			conn.connect();
 			conn.setRequestMethod("GET");
 			QLog.log(QHttpUtil.toString(conn));
 			//

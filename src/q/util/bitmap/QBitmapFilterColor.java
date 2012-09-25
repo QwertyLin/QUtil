@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 
-public final class QBitmapFilterColor {
+public class QBitmapFilterColor {
 
 	/**
 	 * 颜色过滤器ColorFilter

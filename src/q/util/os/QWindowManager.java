@@ -7,28 +7,28 @@ import android.view.WindowManager;
 
 public class QWindowManager {
 	
-	private static QWindowManager instance;
+	private static QWindowManager nInstance;
 	
 	private QWindowManager(){}
 	
 	public static QWindowManager getInstance(Context ctx){
-		if(instance == null){
+		if(nInstance == null){
 			synchronized (QWindowManager.class) {
-				if(instance == null){
-					instance = new QWindowManager();
-					instance.init(ctx);
+				if(nInstance == null){
+					nInstance = new QWindowManager();
+					nInstance.init(ctx);
 				}
 			}
 		}
-		return instance;
+		return nInstance;
 	}
 	
-	private int width;//宽度分辨率
-	private int height;//高度分辨率
-	private int dpi;//密度DPI
-	private float scale;//缩放倍数，以480x320为一倍
-	private float scaleRes;//资源缩放倍数，以480x320为一倍
-	private float scaleText;//字体缩放倍数，以480x320为一倍
+	private int nWidth;//宽度分辨率
+	private int nHeight;//高度分辨率
+	private int nDpi;//密度DPI
+	private float nScale;//缩放倍数，以480x320为一倍
+	private float nScaleRes;//资源缩放倍数，以480x320为一倍
+	private float nScaleText;//字体缩放倍数，以480x320为一倍
 	
 	
 	public void init(Context ctx){
@@ -36,65 +36,65 @@ public class QWindowManager {
 		((WindowManager)ctx.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(dm);
 		//
 		
-		width = dm.widthPixels;
-		height = dm.heightPixels;
-		if(width > height) {//高度大于宽度
-			int temp = width;
-			width = height;
-			height = temp;
+		nWidth = dm.widthPixels;
+		nHeight = dm.heightPixels;
+		if(nWidth > nHeight) {//高度大于宽度
+			int temp = nWidth;
+			nWidth = nHeight;
+			nHeight = temp;
 		}
-		QLog.kv(this, "init", "width", width);
-		QLog.kv(this, "init", "height", height);
+		QLog.kv(this, "init", "width", nWidth);
+		QLog.kv(this, "init", "height", nHeight);
 		//
-		dpi = dm.densityDpi;
-		QLog.kv(this, "init", "dpi", dpi);
+		nDpi = dm.densityDpi;
+		QLog.kv(this, "init", "dpi", nDpi);
 		//
-		scale = (float)(width / 320.0);//以480x320为一倍
-		QLog.kv(this, "init", "scale", scale);
+		nScale = (float)(nWidth / 320.0);//以480x320为一倍
+		QLog.kv(this, "init", "scale", nScale);
 		//	
-		if (dpi < 130) {
-			scaleRes = 0.75f;
-		} else if (dpi < 200) {
-			scaleRes = 1;
-		} else if (dpi < 320) {
-			scaleRes = 1.5f;
+		if (nDpi < 130) {
+			nScaleRes = 0.75f;
+		} else if (nDpi < 200) {
+			nScaleRes = 1;
+		} else if (nDpi < 320) {
+			nScaleRes = 1.5f;
 		} else {
-			scaleRes = 2f;
+			nScaleRes = 2f;
 		}
-		QLog.kv(this, "init", "scaleRes", scaleRes);
+		QLog.kv(this, "init", "scaleRes", nScaleRes);
 		//
-		if (dpi == DisplayMetrics.DENSITY_LOW) {
-			scaleText = 2f;
-		} else if (dpi == DisplayMetrics.DENSITY_MEDIUM) {
-			scaleText = 3f / 2f;
+		if (nDpi == DisplayMetrics.DENSITY_LOW) {
+			nScaleText = 2f;
+		} else if (nDpi == DisplayMetrics.DENSITY_MEDIUM) {
+			nScaleText = 3f / 2f;
 		} else {
-			scaleText = 1f;
+			nScaleText = 1f;
 		}
-		QLog.kv(this, "init", "scaleText", scaleText);
+		QLog.kv(this, "init", "scaleText", nScaleText);
 	}
 
 	public int getWidth() {
-		return width;
+		return nWidth;
 	}
 
 	public int getHeight() {
-		return height;
+		return nHeight;
 	}
 
 	public int getDpi() {
-		return dpi;
+		return nDpi;
 	}
 
 	public float getScale() {
-		return scale;
+		return nScale;
 	}
 
 	public float getScaleRes() {
-		return scaleRes;
+		return nScaleRes;
 	}
 
 	public float getScaleText() {
-		return scaleText;
+		return nScaleText;
 	}
 	
 	

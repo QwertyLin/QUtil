@@ -1,4 +1,4 @@
-package q.util;
+package q.util.code;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

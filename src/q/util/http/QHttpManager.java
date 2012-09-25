@@ -4,12 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import q.util.QCodeUtil;
 import q.util.QLog;
-import q.util.QStreamUtil;
+import q.util.code.QCodeUtil;
+import q.util.stream.QStreamUtil;
+import q.util.thread.QThreadManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -22,29 +20,27 @@ import android.os.SystemClock;
  */
 public class QHttpManager {
 	
-	private static QHttpManager instance;
+	private static QHttpManager nInstance;
 	
 	private QHttpManager(){}
 	
 	public static QHttpManager getInstance(Context ctx){
-		if(instance == null){
+		if(nInstance == null){
 			synchronized (QHttpManager.class) {
-				if(instance == null){
-					instance = new QHttpManager();
-					instance.init(ctx);
+				if(nInstance == null){
+					nInstance = new QHttpManager();
+					nInstance.init(ctx);
 				}
 			}
 		}
-		return instance;
+		return nInstance;
 	}
 	
-	private ExecutorService threadPool;//线程池
-	private String cacheDir; //必须以"/"结尾
+	private String nCacheDir; //必须以"/"结尾
 	
 	private void init(Context ctx){
-		cacheDir = ctx.getCacheDir().getPath() + File.separator;
-		threadPool = Executors.newFixedThreadPool(5);//5个线程
-		QLog.kv(this, "init", "cacheDir", cacheDir);
+		nCacheDir = ctx.getCacheDir().getPath() + File.separator;
+		QLog.kv(this, "init", "cacheDir", nCacheDir);
 	}
 	
 	private boolean checkCache(File cacheFile, long cacheExpire){
@@ -65,7 +61,7 @@ public class QHttpManager {
      */
     public void get(final String url, final Callback callback){    	
     	
-    	final File cacheFile = (callback.getCacheFile() == null) ? new File(cacheDir + QCodeUtil.md5(url)) : new File(callback.getCacheFile());
+    	final File cacheFile = (callback.getCacheFile() == null) ? new File(nCacheDir + QCodeUtil.md5(url)) : new File(callback.getCacheFile());
     	QLog.kv(this, "get", "remote", url);
     	QLog.kv(this, "get", "local", cacheFile.getPath());
     	//
@@ -74,7 +70,7 @@ public class QHttpManager {
     		return;
     	}
     	//
-    	threadPool.submit(new Runnable() {
+    	QThreadManager.getInstance().execute(new Runnable() {
 			@Override
 			public void run() {
 				SystemClock.sleep(2000);//TODO
@@ -93,13 +89,13 @@ public class QHttpManager {
 	 * 删除缓存
 	 */
 	public final void deleteCache(String url){
-		File file = new File(cacheDir + QCodeUtil.md5(url));
+		File file = new File(nCacheDir + QCodeUtil.md5(url));
 		file.delete();
 		QLog.log("ope：删除缓存：" + file.getAbsolutePath());
 	}
 	
 	public String getFilePath(String url){
-		return cacheDir + QCodeUtil.md5(url);
+		return nCacheDir + QCodeUtil.md5(url);
 	}
 	
 	private static abstract class Callback {

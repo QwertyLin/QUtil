@@ -13,42 +13,42 @@ import android.os.Environment;
  */
 public class QFileManager {
 	
-	private static QFileManager instance;
+	private static QFileManager nInstance;
 	
 	private QFileManager(){}
 	
 	public static QFileManager getInstance(Context ctx){
-		if(instance == null){
+		if(nInstance == null){
 			synchronized (QFileManager.class) {
-				if(instance == null){
-					instance = new QFileManager();
-					instance.init(ctx);
+				if(nInstance == null){
+					nInstance = new QFileManager();
+					nInstance.init(ctx);
 				}
 			}
 		}
-		return instance;
+		return nInstance;
 	}
 	
-	public String root;
+	public String nRoot;
 		
 	/**
 	 * 初始化
 	 */
 	private void init(Context ctx){
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {//挂载sd卡
-			root = Environment.getExternalStorageDirectory().getPath() + File.separator + ctx.getPackageName() + File.separator;
+			nRoot = Environment.getExternalStorageDirectory().getPath() + File.separator + ctx.getPackageName() + File.separator;
 		}else{
-			root = ctx.getCacheDir() + File.separator;
+			nRoot = ctx.getCacheDir() + File.separator;
 		}
-		File file = new File(root);
+		File file = new File(nRoot);
 		if(!file.exists()){
 			file.mkdirs();
 		}
-		QLog.kv(this, "init", "root", root);
+		QLog.kv(this, "init", "root", nRoot);
 	}
 	
 	public String get(String dir){
-		String filePath = root + dir + File.separator;
+		String filePath = nRoot + dir + File.separator;
 		File file = new File(filePath);
 		if(file.exists() || file.mkdirs()){
 			return filePath;

@@ -11,33 +11,33 @@ import android.app.Activity;
  */
 public class QActivityManager {
 	
-	private static QActivityManager instance;
+	private static QActivityManager nInstance;
 	
 	private QActivityManager(){}
 	
 	public static QActivityManager getInstance(){
-		if(instance == null){
+		if(nInstance == null){
 			synchronized (QActivityManager.class) {
-				if(instance == null){
-					instance = new QActivityManager();
+				if(nInstance == null){
+					nInstance = new QActivityManager();
 				}
 			}
 		}
-		return instance;
+		return nInstance;
 	}
 	
-	private ArrayList<Activity> cache = new ArrayList<Activity>();
+	private ArrayList<Activity> nCache = new ArrayList<Activity>();
 	
 	public void add(Activity act){
-		cache.add(act);
+		nCache.add(act);
 	}
 	
 	public Activity get(int index){
-		return cache.get(index);
+		return nCache.get(index);
 	}
 	
 	public void finishAll(){
-		for(Activity act : cache){
+		for(Activity act : nCache){
 			if(act != null){
 				act.finish();
 			}
@@ -48,6 +48,6 @@ public class QActivityManager {
 	 * 因为cache保存了对Activity的引用，当确定不需要退出多个Activity时，应及时调用recycle(), 以便gc。
 	 */
 	public void recycle(){
-		cache.clear();
+		nCache.clear();
 	}
 }

@@ -8,7 +8,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Bitmap.Config;
 import android.graphics.drawable.Drawable;
 
-public final class QBitmapUtil {
+public class QBitmapUtil {
 	
 	public static final String toString(Bitmap bm){
 		StringBuffer sb = new StringBuffer();

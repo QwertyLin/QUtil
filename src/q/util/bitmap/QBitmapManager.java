@@ -11,26 +11,26 @@ import android.graphics.Bitmap;
  */
 public class QBitmapManager {
 	
-	private static QBitmapManager instance;
+	private static QBitmapManager nInstance;
 	
 	private QBitmapManager(){}
 	
 	public static QBitmapManager getInstance(){
-		if(instance == null){
+		if(nInstance == null){
 			synchronized (QBitmapManager.class) {
-				if(instance == null){
-					instance = new QBitmapManager();
+				if(nInstance == null){
+					nInstance = new QBitmapManager();
 				}
 			}
 		}
-		return instance;
+		return nInstance;
 	}
 
-	private HashMap<String, SoftReference<Bitmap>> cache = new HashMap<String, SoftReference<Bitmap>>();
+	private HashMap<String, SoftReference<Bitmap>> nCache = new HashMap<String, SoftReference<Bitmap>>();
 	
 	public Bitmap get(String key){
-		if(cache.containsKey(key)){
-			Bitmap bm = cache.get(key).get();
+		if(nCache.containsKey(key)){
+			Bitmap bm = nCache.get(key).get();
 			if(bm != null && !bm.isRecycled()){
 				return bm;
 			}
@@ -39,7 +39,7 @@ public class QBitmapManager {
 	}
 	
 	public void put(String key, Bitmap bm){
-		cache.put(key, new SoftReference<Bitmap>(bm)); 
+		nCache.put(key, new SoftReference<Bitmap>(bm)); 
 	}
 	
 	/**
@@ -47,12 +47,12 @@ public class QBitmapManager {
 	 */
 	public void clear(){
 		Bitmap bm;
-		for(String key : cache.keySet()){
-			bm = cache.get(key).get();
+		for(String key : nCache.keySet()){
+			bm = nCache.get(key).get();
 			if(bm != null && !bm.isRecycled()){
 				bm.recycle();
 			}
 		}
-		cache.clear();
+		nCache.clear();
 	}
 }
