@@ -14,7 +14,7 @@ import android.widget.AbsListView.OnScrollListener;
  * 为ListView增加“自动加载更多”功能
  * 需要在setAdapter之前调用
  */
-public class QListAutoLoadMore implements OnScrollListener {
+public class QAutoLoadMoreListView implements OnScrollListener {
 	
 	public interface Callback {
 		/**
@@ -38,7 +38,7 @@ public class QListAutoLoadMore implements OnScrollListener {
 	private View mViewFooter; //底部正在加载View
 	private Handler mHandler;
 
-	public QListAutoLoadMore(Context ctx, ListView listView, View viewFooter, Callback callback){
+	public QAutoLoadMoreListView(Context ctx, ListView listView, View viewFooter, Callback callback){
 		this.mListView = listView;
 		this.mCallback = callback;
 		//
