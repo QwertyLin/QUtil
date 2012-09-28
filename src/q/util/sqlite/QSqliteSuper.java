@@ -2,7 +2,7 @@ package q.util.sqlite;
 
 import java.util.ArrayList;
 
-import q.util.QUtil;
+import q.util.Q;
 import q.util.sqlite.Demo.Entity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public abstract class QSqliteSuper<T extends QUtil.sqlite.entity> {
+public abstract class QSqliteSuper<T extends Q.sqlite.entity> {
 	
 	public QSqliteSuper(Context ctx){
 		dbHelper = QSqliteManager.getInstance(ctx);

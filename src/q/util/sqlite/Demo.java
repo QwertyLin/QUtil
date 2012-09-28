@@ -1,11 +1,11 @@
 package q.util.sqlite;
 
-import q.util.QUtil;
+import q.util.Q;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-public class Demo extends QUtil.sqlite.base<Demo.Entity> {
+public class Demo extends Q.sqlite.base<Demo.Entity> {
 
 
 	public Demo(Context ctx) {
@@ -37,7 +37,7 @@ public class Demo extends QUtil.sqlite.base<Demo.Entity> {
 	/**
 	 * 假设的实体
 	 */
-	public class Entity extends QUtil.sqlite.entity {
+	public class Entity extends Q.sqlite.entity {
 		public String name;
 	}
 

@@ -19,11 +19,16 @@ import q.util.sqlite.QSqliteEntity;
 import q.util.sqlite.QSqliteSuper;
 import q.util.stream.QStreamUtil;
 import q.util.thread.QThreadManager;
+import q.view.QView;
 
-public class QUtil {
+public class Q {
 	
 	/* Log */
 	public static class log extends QLog{}
+	
+	/* View */
+	
+	public static class view extends QView{}
 	
 	/* Activity */
 	public static final class activity {
@@ -105,7 +110,7 @@ public class QUtil {
 		 */
 		public static abstract class entity extends QSqliteEntity{}
 		
-		public static abstract class base<T extends QUtil.sqlite.entity> extends QSqliteSuper<T>{
+		public static abstract class base<T extends Q.sqlite.entity> extends QSqliteSuper<T>{
 			public base(Context ctx) {
 				super(ctx);
 			}

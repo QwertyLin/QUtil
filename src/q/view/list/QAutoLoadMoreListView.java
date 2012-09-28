@@ -1,46 +1,46 @@
 package q.view.list;
 
-import q.util.QUtil;
+import q.util.Q;
 import android.content.Context;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
 
 /**
  * 为ListView增加“自动加载更多”功能
- * 需要在setAdapter之前调用
  */
 public class QAutoLoadMoreListView implements OnScrollListener {
 	
-	public interface Callback {
-		/**
-		 * @return true继续执行onMoreOnThread
-		 */
-		boolean onMoreStart();
+	public interface OnLoadMoreListener {
+
+		void onStart();
 		/**
 		 * 在非UI线程运行
 		 * @return 是否还有更多
 		 */
-		boolean onMoreOnThread();
-		void onMoreFinish();
+		boolean onBackground();
+		void onFinish();
 		void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount);
 	}
 	
 	private ListView mListView;
-	private Callback mCallback;
+	private BaseAdapter mAdapter;
+	private OnLoadMoreListener mListener;
 	private boolean mIsLoadingMore; //是否正在加载更多
 	private boolean mHasMore = true; //是否还有更多，若没则不再显示底部提示
 	private Runnable mTaskMore; //异步执行的任务
 	private View mViewFooter; //底部正在加载View
 	private Handler mHandler;
 
-	public QAutoLoadMoreListView(Context ctx, ListView listView, View viewFooter, Callback callback){
+	public QAutoLoadMoreListView(Context ctx, ListView listView, BaseAdapter adapter, View viewFooter, OnLoadMoreListener listener){
 		this.mListView = listView;
-		this.mCallback = callback;
+		this.mAdapter = adapter;
+		this.mListener = listener;
 		//
 		if(viewFooter == null){
 			TextView tv = new TextView(ctx);
@@ -54,6 +54,8 @@ public class QAutoLoadMoreListView implements OnScrollListener {
 		listView.addFooterView(this.mViewFooter);
 		//
 		listView.setOnScrollListener(this);
+		//
+		listView.setAdapter(adapter);
 	}
 	
 	public boolean isLoadingMore(){
@@ -66,22 +68,24 @@ public class QAutoLoadMoreListView implements OnScrollListener {
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
-		mCallback.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+		mListener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
 		if(!mIsLoadingMore && mHasMore && totalItemCount != 0 && firstVisibleItem + visibleItemCount == totalItemCount ){
-			QUtil.log.log(this, "onMore");
+			Q.log.log(this, "onMore");
 			mIsLoadingMore = true;
 			//
+			mListener.onStart();
 			if(mTaskMore == null){
 				mTaskMore = new Runnable() {
 					@Override
 					public void run() {
-						mHasMore = mCallback.onMoreOnThread();
+						mHasMore = mListener.onBackground();
 						mHandler.sendEmptyMessage(0);
 					}
 				};
 				mHandler = new Handler(){
 					public void handleMessage(android.os.Message msg) {
-						mCallback.onMoreFinish();
+						mListener.onFinish();
+						mAdapter.notifyDataSetChanged();
 						mIsLoadingMore = false;
 						if(!mHasMore){
 							mListView.removeFooterView(mViewFooter);
@@ -89,11 +93,7 @@ public class QAutoLoadMoreListView implements OnScrollListener {
 					};
 				};
 			}
-			if(!mCallback.onMoreStart()){
-				mIsLoadingMore = false;
-				return;
-			}
-			new Thread(mTaskMore).start();
+			Q.thread.manager().execute(mTaskMore);
 		}
 	}
 }

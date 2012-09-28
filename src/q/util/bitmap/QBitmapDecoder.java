@@ -2,7 +2,7 @@ package q.util.bitmap;
 
 import java.io.FileNotFoundException;
 
-import q.util.QUtil;
+import q.util.Q;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -129,7 +129,7 @@ public class QBitmapDecoder {
 		}
 		Bitmap temp = deLoose(file, width, height);
 		Bitmap bm = deInSize(temp, width, height);
-		QUtil.bitmap.util.recycle(temp);
+		Q.bitmap.util.recycle(temp);
 		return bm;
 	}
 	
@@ -147,7 +147,7 @@ public class QBitmapDecoder {
 		}
 		Bitmap temp = deLoose(ctx, uri, width, height);
 		Bitmap bm = deInSize(temp, width, height);
-		QUtil.bitmap.util.recycle(temp);
+		Q.bitmap.util.recycle(temp);
 		return bm;
 	}
 	

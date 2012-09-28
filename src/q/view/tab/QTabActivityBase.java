@@ -1,4 +1,4 @@
-package q.util.view;
+package q.view.tab;
 
 import android.app.TabActivity;
 import android.content.Intent;
@@ -15,7 +15,7 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 
-public abstract class QTabActivity extends TabActivity implements OnCheckedChangeListener {
+public abstract class QTabActivityBase extends TabActivity implements OnCheckedChangeListener {
 	
 	private TabHost tabHost;
 

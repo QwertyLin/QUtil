@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
 import q.util.QLog;
-import q.util.QUtil;
+import q.util.Q;
 import q.util.code.QCodeUtil;
 import q.util.stream.QStreamUtil;
 import q.util.thread.QThreadManager;
@@ -41,13 +41,13 @@ public class QHttpManager {
 	
 	private void init(Context ctx){
 		nCacheDir = ctx.getCacheDir().getPath() + File.separator;
-		QUtil.log.kv(this, "init", "cacheDir", nCacheDir);
+		Q.log.kv(this, "init", "cacheDir", nCacheDir);
 	}
 	
 	private boolean checkCache(File cacheFile, long cacheExpire){
 		//缓存，如果读取本地缓存，则不开线程请求网络
 		if(cacheExpire != 0 && cacheFile.exists() && cacheExpire > new Date().getTime() - cacheFile.lastModified()){
-			QUtil.log.kv(this, "checkCache", "cache available", true);
+			Q.log.kv(this, "checkCache", "cache available", true);
 			return true;
     	}
 		QLog.kv(this, "checkCache", "cache available", false);
@@ -62,21 +62,21 @@ public class QHttpManager {
      */
     public void get(final String url, final Callback callback){    	
     	
-    	final File cacheFile = (callback.getCacheFile() == null) ? new File(nCacheDir + QUtil.code.util.md5(url)) : new File(callback.getCacheFile());
-    	QUtil.log.kv(this, "get", "remote", url);
-    	QUtil.log.kv(this, "get", "local", cacheFile.getPath());
+    	final File cacheFile = (callback.getCacheFile() == null) ? new File(nCacheDir + Q.code.util.md5(url)) : new File(callback.getCacheFile());
+    	Q.log.kv(this, "get", "remote", url);
+    	Q.log.kv(this, "get", "local", cacheFile.getPath());
     	//
     	if(checkCache(cacheFile, callback.getCacheTime())){
     		callback.success(cacheFile, url);
     		return;
     	}
     	//
-    	QUtil.thread.manager().execute(new Runnable() {
+    	Q.thread.manager().execute(new Runnable() {
 			@Override
 			public void run() {
 				SystemClock.sleep(2000);//TODO
 				try {
-					QUtil.http.util.getFile(url, cacheFile, callback.checkExist());
+					Q.http.util.getFile(url, cacheFile, callback.checkExist());
 					callback.success(cacheFile, url);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -90,13 +90,13 @@ public class QHttpManager {
 	 * 删除缓存
 	 */
 	public final void deleteCache(String url){
-		File file = new File(nCacheDir + QUtil.code.util.md5(url));
+		File file = new File(nCacheDir + Q.code.util.md5(url));
 		file.delete();
-		QUtil.log.log(this, "ope：删除缓存：" + file.getAbsolutePath());
+		Q.log.log(this, "ope：删除缓存：" + file.getAbsolutePath());
 	}
 	
 	public String getFilePath(String url){
-		return nCacheDir + QUtil.code.util.md5(url);
+		return nCacheDir + Q.code.util.md5(url);
 	}
 	
 	private static abstract class Callback {
@@ -143,7 +143,7 @@ public class QHttpManager {
 				break;
 			case TEXT:
 				try {
-					String text = QUtil.stream.util.toStr(new FileInputStream(file));
+					String text = Q.stream.util.toStr(new FileInputStream(file));
 					if(verify(text)){
 						h.obj = text;
 					}else{

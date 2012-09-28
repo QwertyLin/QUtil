@@ -1,10 +1,26 @@
 package q.util.os;
 
+import q.util.Q;
 import android.app.Activity;
+import android.content.Context;
 import android.view.Window;
 import android.view.WindowManager;
 
 public class QWindowUtil {
+	
+	/**
+	 * dip转px
+	 */
+	public static int dip2px(Context ctx, float dip){ 
+        return (int)(dip * Q.os.window.manager(ctx).getScale() + 0.5f); 
+	} 
+	
+	/**
+	 * px转dip
+	 */
+	public static int px2dip(Context ctx, float px){ 
+        return (int)(px / Q.os.window.manager(ctx).getScale() + 0.5f); 
+	} 
 	
 	/**
 	 * 设置为无标题栏，必须在setContentView之前调用

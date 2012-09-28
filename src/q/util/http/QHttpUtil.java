@@ -21,7 +21,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import q.util.QLog;
-import q.util.QUtil;
+import q.util.Q;
 
 public class QHttpUtil {
 	
@@ -74,7 +74,7 @@ public class QHttpUtil {
 			//
 			conn.connect();
 			conn.setRequestMethod("GET");
-			QUtil.log.log(QHttpUtil.class, QUtil.http.util.toString(conn));
+			Q.log.log(QHttpUtil.class, Q.http.util.toString(conn));
 			//
 			//Header
 			//urlConnection.setRequestProperty("Host", "www.baidu.com");
@@ -137,12 +137,12 @@ public class QHttpUtil {
 			}
 			//
 			conn.setRequestMethod("GET");
-			QUtil.log.log(QHttpUtil.class, QUtil.http.util.toString(conn));
+			Q.log.log(QHttpUtil.class, Q.http.util.toString(conn));
 			//
 			if(conn.getResponseCode() == 200){
 				//文件大小不变时,不更新
 				if(checkExist && file.exists() && file.length() == conn.getContentLength()){
-					QLog.log("文件无变化");
+					QLog.log(QHttpUtil.class, "文件无变化");
 					return;
 				}
 				//
@@ -244,7 +244,7 @@ public class QHttpUtil {
 				}
 			}
 			//
-			QUtil.http.util.toString(conn);
+			Q.http.util.toString(conn);
 			//
 			if(conn.getResponseCode() == 200){
 				StringBuffer temp = new StringBuffer();

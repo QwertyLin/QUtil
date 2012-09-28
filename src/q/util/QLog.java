@@ -59,32 +59,4 @@ public class QLog {
 			Log.d(tag.getClass().getSimpleName(), msg);
 		}
 	}
-	
-	@Deprecated
-	public static final void log(String msg){
-		if(available){
-			Log.d("Q", msg);
-		}
-	}
-	
-	@Deprecated
-	public static final void log(boolean msg){
-		if(available){
-			log(String.valueOf(msg));
-		}
-	}
-	
-	@Deprecated
-	public static final void log(int msg){
-		if(available){
-			log(String.valueOf(msg));
-		}
-	}
-	
-	@Deprecated
-	public static final void log(StringBuffer sb){
-		if(available){
-			log(sb.toString());
-		}
-	}
 }

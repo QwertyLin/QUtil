@@ -9,13 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-public abstract class  QBaseAdapter<T> extends BaseAdapter {
+public abstract class  QAdapterBase<T> extends BaseAdapter {
 	
 	protected List<T> mDatas;
 	protected Context mCtx;
 	protected LayoutInflater mInflater;
 	
-	public QBaseAdapter(Context ctx, List<T> datas) {
+	public QAdapterBase(Context ctx, List<T> datas) {
 		this.mCtx = ctx;
 		this.mDatas =  datas;
 		this.mInflater = ((Activity)ctx).getLayoutInflater();
