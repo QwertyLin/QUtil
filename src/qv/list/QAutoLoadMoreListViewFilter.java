@@ -15,7 +15,7 @@ import android.widget.AbsListView.OnScrollListener;
 /**
  * 为ListView增加“自动加载更多”功能
  */
-public class QAutoLoadMoreListViewFilter implements OnScrollListener {
+public class QAutoLoadMoreListViewFilter implements OnScrollListener, Runnable {
 	
 	public interface OnLoadMoreListener {
 
@@ -26,7 +26,6 @@ public class QAutoLoadMoreListViewFilter implements OnScrollListener {
 		 */
 		boolean onBackground();
 		void onFinish();
-		void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount);
 	}
 	
 	private ListView mListView;
@@ -36,33 +35,6 @@ public class QAutoLoadMoreListViewFilter implements OnScrollListener {
 	private boolean mIsDoing; //是否正在执行
 	private boolean mEnable;//是否有效，即是否自动加载更多
 	
-	private Handler mHandler = new Handler(){
-		public void handleMessage(android.os.Message msg) {
-			switch(msg.what){
-			case 0://finish
-				mListener.onFinish();
-				mAdapter.notifyDataSetChanged();
-				mIsDoing = false;
-				break;
-			case 1://enable true
-				mListView.removeFooterView(mViewFooter);
-				mListView.addFooterView(mViewFooter);
-				break;
-			case 2://enable false
-				mListView.removeFooterView(mViewFooter);
-				break;
-			}
-		};
-	};
-	
-	private Runnable mRunnable = new Runnable() { //异步执行的任务
-		@Override
-		public void run() {
-			setEnable(mListener.onBackground());
-			mHandler.sendEmptyMessage(0);
-		}
-	};
-
 	public QAutoLoadMoreListViewFilter(Context ctx, ListView listView, BaseAdapter adapter, View viewFooter, OnLoadMoreListener listener){
 		this.mListView = listView;
 		this.mAdapter = adapter;
@@ -89,14 +61,53 @@ public class QAutoLoadMoreListViewFilter implements OnScrollListener {
 	public void onScrollStateChanged(AbsListView view, int scrollState) {}
 
 	@Override
-	public void onScroll(AbsListView view, int firstVisibleItem,
-			int visibleItemCount, int totalItemCount) {
-		mListener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 		if(mEnable && !mIsDoing && totalItemCount != 0 && firstVisibleItem + visibleItemCount == totalItemCount ){
 			QLog.log(this, "onMore");
 			mIsDoing = true;
 			mListener.onStart();
-			QThreadManager.getInstance().execute(mRunnable);
+			QThreadManager.getInstance().execute(this);
+		}
+	}
+	
+	@Override
+	public void run() {
+		setEnable(mListener.onBackground());
+		mHandler.sendEmptyMessage(0);
+	}
+	
+	private Handler mHandler = new Handler(){
+		public void handleMessage(android.os.Message msg) {
+			switch(msg.what){
+			case 0:
+				onFinish();
+				break;
+			case 1://enable true
+				onSetEnable(true);
+				break;
+			case 2://enable false
+				onSetEnable(false);
+				break;
+			}
+		};
+	};
+	
+	private void onFinish(){
+		mListener.onFinish();
+		mAdapter.notifyDataSetChanged();
+		mIsDoing = false;
+	}
+	
+	/**
+	 * 改变状态
+	 * @param enable
+	 */
+	private void onSetEnable(boolean enable){
+		if(enable){
+			mListView.removeFooterView(mViewFooter);
+			mListView.addFooterView(mViewFooter);
+		}else{
+			mListView.removeFooterView(mViewFooter);
 		}
 	}
 	
@@ -122,4 +133,6 @@ public class QAutoLoadMoreListViewFilter implements OnScrollListener {
 	public boolean isDoing(){
 		return mIsDoing;
 	}
+
+	
 }
