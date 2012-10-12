@@ -2,7 +2,7 @@ package qv.list;
 
 import android.widget.ListView;
 
-public class QListViewUtil {
+public class ListViewUtil {
 
 	public static void init(ListView listView){
 		listView.setCacheColorHint(0x00000000);

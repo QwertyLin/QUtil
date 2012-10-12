@@ -2,7 +2,6 @@ package q.thread;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class QThreadManager {
 	
@@ -22,18 +21,12 @@ public class QThreadManager {
 	
 	private ExecutorService nThreadPool;//线程池
 	
-	public ExecutorService getExecutorService(){
-		return nThreadPool;
-	}
-	
 	public void execute(Runnable command){
 		nThreadPool.execute(command);
 	}
 	
-	public Future<?> submit(Runnable task){
-		return nThreadPool.submit(task);
+	public ExecutorService getExecutorService(){
+		return nThreadPool;
 	}
-	
-	
 
 }

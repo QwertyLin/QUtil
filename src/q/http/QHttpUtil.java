@@ -1,5 +1,6 @@
 package q.http;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +22,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import q.QLog;
+
 
 public class QHttpUtil {
 	
@@ -120,10 +122,10 @@ public class QHttpUtil {
     /**
      * @param urlStr
      * @param filePath
-     * @param checkExist 检测已存在的文件跟远程文件是否大小一样
+     * @param isCheckExist 检测已存在的文件跟远程文件是否大小一样
      * @throws IOException
      */
-    public static void getFile(String urlStr, File file, boolean checkExist) throws IOException {
+    public static void getFile(String urlStr, File file, boolean isCheckExist) throws IOException {
     	HttpURLConnection conn = null;
     	InputStream in = null;
     	FileOutputStream out = null;
@@ -140,7 +142,7 @@ public class QHttpUtil {
 			//
 			if(conn.getResponseCode() == 200){
 				//文件大小不变时,不更新
-				if(checkExist && file.exists() && file.length() == conn.getContentLength()){
+				if(isCheckExist && file.exists() && file.length() == conn.getContentLength()){
 					QLog.log(QHttpUtil.class, "文件无变化");
 					return;
 				}

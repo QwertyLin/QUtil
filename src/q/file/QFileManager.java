@@ -1,8 +1,10 @@
 package q.file;
 
+
 import java.io.File;
 
 import q.QLog;
+
 
 import android.content.Context;
 import android.os.Environment;
@@ -15,26 +17,7 @@ public class QFileManager {
 	
 	private static QFileManager nInstance;
 	
-	private QFileManager(){}
-	
-	public static QFileManager getInstance(Context ctx){
-		if(nInstance == null){
-			synchronized (QFileManager.class) {
-				if(nInstance == null){
-					nInstance = new QFileManager();
-					nInstance.init(ctx);
-				}
-			}
-		}
-		return nInstance;
-	}
-	
-	public String nRoot;
-		
-	/**
-	 * 初始化
-	 */
-	private void init(Context ctx){
+	private QFileManager(Context ctx){
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {//挂载sd卡
 			nRoot = Environment.getExternalStorageDirectory().getPath() + File.separator + ctx.getPackageName() + File.separator;
 		}else{
@@ -46,6 +29,19 @@ public class QFileManager {
 		}
 		QLog.kv(this, "init", "root", nRoot);
 	}
+	
+	public static QFileManager getInstance(Context ctx){
+		if(nInstance == null){
+			synchronized (QFileManager.class) {
+				if(nInstance == null){
+					nInstance = new QFileManager(ctx);
+				}
+			}
+		}
+		return nInstance;
+	}
+	
+	private String nRoot;
 	
 	public String get(String dir){
 		String filePath = nRoot + dir + File.separator;

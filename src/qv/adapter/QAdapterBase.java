@@ -9,7 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-public abstract class  QAdapterBase<T> extends BaseAdapter {
+/**
+ *
+ * @param <T> 数据荣容器的类型
+ * @param <H> 布局容器的类型
+ */
+public abstract class  QAdapterBase<T, H> extends BaseAdapter {
 	
 	protected List<T> mDatas;
 	protected Context mCtx;
@@ -38,19 +43,19 @@ public abstract class  QAdapterBase<T> extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View v, ViewGroup parent) {
-		Object h = null;
+		H h = null;
 		if(v == null){
 			v = mInflater.inflate(getLayoutId(), null);
-			h = getViewHolder(v);
+			h = getHolder(v);
 			v.setTag(h);
 		}else{
-			h = v.getTag();
+			h = (H)v.getTag();
 		}
-		onInitItem(position, mDatas.get(position), h);
+		initItem(position, mDatas.get(position), h);
 		return v;
 	}
 	
 	protected abstract int getLayoutId();
-	protected abstract Object getViewHolder(View v);
-	protected abstract void onInitItem(int position, T data, Object viewHolder);
+	protected abstract H getHolder(View v);
+	protected abstract void initItem(int position, T data, H holder);
 }

@@ -6,9 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import android.content.Context;
-
-import q.http.QHttpManager;
 
 public final class QUtil2 {
 	
