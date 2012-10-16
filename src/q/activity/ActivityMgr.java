@@ -9,17 +9,17 @@ import android.app.Activity;
  * 
  * 尽量继承本类，如QActivityCache4XXX，使功能更单一。
  */
-public class QActivityManager {
+public class ActivityMgr {
 	
-	private static QActivityManager nInstance;
+	private static ActivityMgr nInstance;
 	
-	private QActivityManager(){}
+	private ActivityMgr(){}
 	
-	public static QActivityManager getInstance(){
+	public static ActivityMgr getInstance(){
 		if(nInstance == null){
-			synchronized (QActivityManager.class) {
+			synchronized (ActivityMgr.class) {
 				if(nInstance == null){
-					nInstance = new QActivityManager();
+					nInstance = new ActivityMgr();
 				}
 			}
 		}

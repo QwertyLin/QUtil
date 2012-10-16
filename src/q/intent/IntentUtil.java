@@ -11,7 +11,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-public class QIntentUtil {
+public class IntentUtil {
 	
 	/**
 	 * 打开相册，返回数据调用resultBitmap()

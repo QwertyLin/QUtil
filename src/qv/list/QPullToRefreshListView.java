@@ -1,5 +1,5 @@
 package qv.list;
-import q.thread.QThreadManager;
+import q.thread.ThreadMgr;
 import qv.list.pulltorefresh.PullToRefreshBase;
 import qv.list.pulltorefresh.PullToRefreshListView;
 import android.content.Context;
@@ -76,7 +76,7 @@ public class QPullToRefreshListView extends PullToRefreshListView {
 						};
 					};
 				}
-				QThreadManager.getInstance().execute(mRun);
+				ThreadMgr.getInstance().execute(mRun);
 			}
 		});
 	}

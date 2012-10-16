@@ -10,7 +10,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class QCodeUtil {
+public class CodeUtil {
 
 	/**
 	 * DES加密

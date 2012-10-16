@@ -13,11 +13,11 @@ import android.os.Environment;
  * 管理手机内存与SD卡内存中的文件路径
  *
  */
-public class QFileManager {
+public class FileMgr {
 	
-	private static QFileManager nInstance;
+	private static FileMgr nInstance;
 	
-	private QFileManager(Context ctx){
+	private FileMgr(Context ctx){
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {//挂载sd卡
 			nRoot = Environment.getExternalStorageDirectory().getPath() + File.separator + ctx.getPackageName() + File.separator;
 		}else{
@@ -30,11 +30,11 @@ public class QFileManager {
 		QLog.kv(this, "init", "root", nRoot);
 	}
 	
-	public static QFileManager getInstance(Context ctx){
+	public static FileMgr getInstance(Context ctx){
 		if(nInstance == null){
-			synchronized (QFileManager.class) {
+			synchronized (FileMgr.class) {
 				if(nInstance == null){
-					nInstance = new QFileManager(ctx);
+					nInstance = new FileMgr(ctx);
 				}
 			}
 		}
@@ -43,7 +43,7 @@ public class QFileManager {
 	
 	private String nRoot;
 	
-	public String get(String dir){
+	private String get(String dir){
 		String filePath = nRoot + dir + File.separator;
 		File file = new File(filePath);
 		if(file.exists() || file.mkdirs()){

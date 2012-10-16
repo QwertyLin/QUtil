@@ -5,22 +5,22 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
-public class QWindowManager {
+public class WindowMgr {
 	
-	private static QWindowManager nInstance;
+	private static WindowMgr nInstance;
 	
-	public static QWindowManager getInstance(Context ctx){
+	public static WindowMgr getInstance(Context ctx){
 		if(nInstance == null){
-			synchronized (QWindowManager.class) {
+			synchronized (WindowMgr.class) {
 				if(nInstance == null){
-					nInstance = new QWindowManager(ctx);
+					nInstance = new WindowMgr(ctx);
 				}
 			}
 		}
 		return nInstance;
 	}
 	
-	private QWindowManager(Context ctx){
+	private WindowMgr(Context ctx){
 		DisplayMetrics dm = new DisplayMetrics(); 
 		((WindowManager)ctx.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(dm);
 		//

@@ -5,20 +5,20 @@ import android.content.Context;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class QWindowUtil {
+public class WindowUtil {
 	
 	/**
 	 * dip转px
 	 */
 	public static int dip2px(Context ctx, float dip){ 
-        return (int)(dip * QWindowManager.getInstance(ctx).getScale() + 0.5f); 
+        return (int)(dip * WindowMgr.getInstance(ctx).getScale() + 0.5f); 
 	} 
 	
 	/**
 	 * px转dip
 	 */
 	public static int px2dip(Context ctx, float px){ 
-        return (int)(px / QWindowManager.getInstance(ctx).getScale() + 0.5f); 
+        return (int)(px / WindowMgr.getInstance(ctx).getScale() + 0.5f); 
 	} 
 	
 	/**

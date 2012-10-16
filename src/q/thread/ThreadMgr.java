@@ -3,15 +3,15 @@ package q.thread;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class QThreadManager {
+public class ThreadMgr {
 	
-	private static QThreadManager instance;
-	private QThreadManager(){}
-	public static final QThreadManager getInstance(){
+	private static ThreadMgr instance;
+	private ThreadMgr(){}
+	public static final ThreadMgr getInstance(){
 		if(instance == null){
-			synchronized (QThreadManager.class) {
+			synchronized (ThreadMgr.class) {
 				if(instance == null){
-					instance = new QThreadManager();
+					instance = new ThreadMgr();
 					instance.nThreadPool = Executors.newFixedThreadPool(5);//5个线程
 				}
 			}
