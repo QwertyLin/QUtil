@@ -1,4 +1,4 @@
-package qv.list.more;
+package qv.list.autoMore;
 
 import q.QLog;
 import android.content.Context;
@@ -55,6 +55,20 @@ public class LvAutoMoreUtil {
 			}
 		});
 		//
+	}
+	
+	public static void setEnable(LvAutoMoreEntity en, boolean isEnable) {
+		if(en.isEnable() ^ isEnable){
+			en.setEnable(isEnable);
+			Message msg = LvAutoMoreInstance.getInstance().getHandler().obtainMessage();
+			if(isEnable){
+				msg.what = LvAutoMoreInstance.MSG_ENABLE;
+			}else{
+				msg.what = LvAutoMoreInstance.MSG_DISABLE;
+			}
+			msg.obj = en;
+			LvAutoMoreInstance.getInstance().getHandler().sendMessage(msg);
+		}
 	}
 	
 }

@@ -1,4 +1,4 @@
-package qv.list.more;
+package qv.list.autoMore;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,7 +13,7 @@ public class LvAutoMoreInstance {
 	
 	private LvAutoMoreInstance(){}
 	
-	public static LvAutoMoreInstance getInstance(){
+	protected static LvAutoMoreInstance getInstance(){
 		if(mInstance == null){
 			synchronized (LvAutoMoreInstance.class) {
 				if(mInstance == null){

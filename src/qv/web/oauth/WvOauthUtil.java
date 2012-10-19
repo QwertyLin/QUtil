@@ -1,18 +1,21 @@
-package q.http;
-
+package qv.web.oauth;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -22,46 +25,105 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import q.QLog;
+import android.graphics.Bitmap;
+import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
-
-public class QHttpUtil {
+public class WvOauthUtil {
 	
-	public static String toString(HttpURLConnection conn) throws IOException{
-    	return "response " + 
-        		"url: " + conn.getURL()
-    			+ " ContentEncoding: " + conn.getContentEncoding()
-        		+ " ResponseCode: " + conn.getResponseCode()
-        		+ " ResponseMessage: " + conn.getResponseMessage()
-        		+ " ContentType: " + conn.getContentType()
-        		+ " ConnectTimeout: " + conn.getConnectTimeout()
-        		+ " ReadTimeout: " + conn.getReadTimeout()
-        		+ " ContentLength: " + conn.getContentLength()
-        	;
-    	/*QLog.log();*/
-		//System.out.println("method:"+conn.getRequestMethod());
-		//System.out.println("defaultPort:"+conn.getURL().getDefaultPort());
-		//System.out.println("file:"+conn.getURL().getFile());
-		//System.out.println("host:"+conn.getURL().getHost());
-		//System.out.println("path:"+conn.getURL().getPath());
-		//System.out.println("port:"+conn.getURL().getPort());
-		//System.out.println("protocol:"+conn.getURL().getProtocol());
-		//System.out.println("query:"+conn.getURL().getQuery());
-		//System.out.println("ref:"+conn.getURL().getRef());
-		//System.out.println("userInfo:"+conn.getURL().getUserInfo());
-    }
-
-	public static String get(String urlStr) throws IOException {
-		return get(urlStr, "utf-8");
+	public static final int 
+		TYPE_SINA_WEIBO = 1, //http://open.weibo.com/
+		TYPE_QQ_WEIBO = 2, //http://dev.t.qq.com/
+		TYPE_QQ_ZONE = 3, //http://opensns.qq.com/
+		TYPE_RENREN = 4;
+		
+	public static void init(final WvOauthEntity en){
+		WebSettings set = en.getWebView().getSettings();
+		set.setJavaScriptEnabled(true);
+		set.setSupportZoom(true);
+		set.setBuiltInZoomControls(true);
+		set.setCacheMode(WebSettings.LOAD_NO_CACHE);
+		//
+		en.getWebView().setWebChromeClient(new WebChromeClient(){
+			private boolean isLoadingFinish;
+			@Override
+			public void onProgressChanged(WebView view, int newProgress) {
+				if (!isLoadingFinish && newProgress > 30) {
+					isLoadingFinish = true;
+					en.getListener().onWvOauthLoadingFinish(en);
+				}
+			}
+		});
+		//get auth
+		WebViewClient wvc = new WebViewClient() {
+			int index = 0;
+			@Override
+			public void onPageStarted(WebView view, String url, Bitmap favicon) {
+				QLog.log(WvOauth.class, "url:" + url);
+				Pattern p = Pattern.compile(en.getHandle().getUrlParsePattern());
+				Matcher m = p.matcher(url);
+				if (m.find() && index == 0) {
+					index++;
+					en.getListener().onWvOauthAuthing(en);
+					CookieManager.getInstance().removeAllCookie();//clean cookie
+					en.getWebView().setVisibility(View.GONE);
+					en.getHandle().parseUrl(en, m);
+				}
+			}
+			@Override
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				QLog.log(WvOauth.class, "shouldOverrideUrlLoading url=" + url);
+				if(url.contains("error_uri")  //sina
+					|| url.contains("checkType=error") //QQ
+					|| url.contains("error=login_denied") //renren
+				){
+					return true;
+				}
+				return super.shouldOverrideUrlLoading(view, url);
+			}
+		};
+		en.getWebView().setWebViewClient(wvc);
+		en.getWebView().loadUrl(en.getHandle().getAuthUrl());
 	}
-    
-    /**
-     * 发送HTTP GET请求
-     * @param urlStr 如 http://www.baidu.com/
-     * @param charset "UTF-8"或"GBK"
-     * @return
-     * @throws IOException
-     */    
-    public static String get(String urlStr, String charset) throws IOException {
+	
+	public static boolean isTokenExpire(WvOauthToken token){
+		long timeRemain = token.getExpireTime() - Calendar.getInstance().getTimeInMillis();
+		QLog.log(WvOauthUtil.class, "timeRemain:" + timeRemain + " expire:" + token.getExpireTime());
+		if(timeRemain > 0){ //can be used
+			return false;
+		}else{ //can not be used
+			return true;
+		}
+	}
+	
+	protected static String md5(String str) {
+		MessageDigest md = null;
+		try {
+			md = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return str;
+		}
+		md.update(str.getBytes());
+		byte b[] = md.digest();
+		int i;
+		StringBuffer buf = new StringBuffer("");
+		for (int offset = 0; offset < b.length; offset++) {
+			i = b[offset];
+			if (i < 0)
+				i += 256;
+			if (i < 16)
+				buf.append("0");
+			buf.append(Integer.toHexString(i));
+		}
+		return buf.toString();
+	}
+	
+	protected static String httpGet(String urlStr) throws IOException {
     	HttpURLConnection conn = null;
     	InputStream in = null;
 		BufferedReader bufferedReader = null;
@@ -74,17 +136,10 @@ public class QHttpUtil {
 			}
 			//
 			conn.setRequestMethod("GET");
-			QLog.log(QHttpUtil.class, toString(conn));
-			//
-			//Header
-			//urlConnection.setRequestProperty("Host", "www.baidu.com");
-			//urlConnection.setRequestProperty("Referer", "http://www.baidu.com");
-			//urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6");
-			//
 			if(conn.getResponseCode() == 200){
 				StringBuffer temp = new StringBuffer();
 				in = conn.getInputStream();
-				bufferedReader = new BufferedReader(new InputStreamReader(in, charset));
+				bufferedReader = new BufferedReader(new InputStreamReader(in, "utf-8"));
 				String line = bufferedReader.readLine();
 				while (line != null) {
 					//temp.append(line).append("\r\n");
@@ -113,85 +168,12 @@ public class QHttpUtil {
 			}
 		}
 	}
-    
-    public static void getFile(String urlStr, String file) throws IOException {
-    	getFile(urlStr, new File(file), false);
+	
+	public static String httpPost(String urlStr, String param) throws IOException {
+    	return httpPost(urlStr, param, null, null);    	
     }
-    
-    /**
-     * @param urlStr
-     * @param filePath
-     * @param isCheckExist 检测已存在的文件跟远程文件是否大小一样
-     * @throws IOException
-     */
-    public static void getFile(String urlStr, File file, boolean isCheckExist) throws IOException {
-    	HttpURLConnection conn = null;
-    	InputStream in = null;
-    	FileOutputStream out = null;
-    	try {
-    		URL url = new URL(urlStr);
-			if (url.getProtocol().toLowerCase().equals("http")){
-				conn = (HttpURLConnection) url.openConnection();
-			}else if(url.getProtocol().toLowerCase().equals("https")){
-				conn = initHttpsConn(url);
-			}
-			//
-			conn.setRequestMethod("GET");
-			QLog.log(QHttpUtil.class, toString(conn));
-			//
-			if(conn.getResponseCode() == 200){
-				//文件大小不变时,不更新
-				if(isCheckExist && file.exists() && file.length() == conn.getContentLength()){
-					QLog.log(QHttpUtil.class, "文件无变化");
-					return;
-				}
-				//
-				in = conn.getInputStream();
-				File temp = new File(file.getPath() + ".temp");
-				out = new FileOutputStream(temp);
-				byte[] buffer = new byte[1024];
-		        int len = 0;		        
-		        while((len = in.read(buffer)) != -1){
-		        	out.write(buffer, 0, len);
-				}
-		        if(temp.length() == 0 || !temp.renameTo(file)){
-					throw new IOException();
-				}
-			}else{
-				throw new IOException();
-			}
-    	} catch (IOException e) {
-			throw e;
-		} finally {
-			if(out != null){
-				out.close();
-			}
-			if(in != null){
-				in.close();
-			}
-			if (conn != null){
-				conn.disconnect();
-			}
-		}
-	}
-        
-    public static String post(String urlStr, String param) throws IOException {
-    	return post(urlStr, param, null, null, "utf-8");    	
-    }
-    
-    public static String post(String urlStr, String param, String boundary, String filePath) throws IOException {
-    	return post(urlStr, param, boundary, filePath, "utf-8");
-    }
-    
-    /**
-     * 发送HTTP POST请求
-     * @param urlStr 如 http://www.baidu.com/
-     * @param charset "UTF-8"或"GBK"
-     * @param param &key=value&key2=value
-     * @return
-     * @throws IOException 若输出为空，抛出异常
-     */
-    public static String post(String urlStr, String param, String boundary, String filePath, String charset) throws IOException {
+	
+	public static String httpPost(String urlStr, String param, String boundary, String filePath) throws IOException {
     	HttpURLConnection conn = null;
     	OutputStream output = null;
     	try {
@@ -215,22 +197,20 @@ public class QHttpUtil {
 			}*/
 			//
 			if(filePath == null){
-				//请求参数
 				if(param != null){
 					output = conn.getOutputStream();
 					output.write(param.getBytes());
 					output.flush();
 				}
 			}else{
-				conn.setConnectTimeout(5000);// （单位：毫秒）jdk
-				conn.setReadTimeout(5000);// （单位：毫秒）jdk 1.5换成这个,读操作超时
+				conn.setConnectTimeout(5000);//
+				conn.setReadTimeout(5000);// 
 				conn.setRequestProperty("connection", "keep-alive");
 				conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);		
 				//conn.setRequestProperty("Host", "www.baidu.com");
 				//conn.setRequestProperty("Referer", "http://www.baidu.com");
 				//conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6");
 				//
-				//请求参数
 				File f = new File(filePath);  
 				FileInputStream fileStream = new FileInputStream(f);  
 		        byte[] file = new byte[(int)f.length()];  
@@ -244,14 +224,12 @@ public class QHttpUtil {
 				}
 			}
 			//
-			toString(conn);
-			//
 			if(conn.getResponseCode() == 200){
 				StringBuffer temp = new StringBuffer();
 				
 					InputStream in = conn.getInputStream();
 					BufferedReader bufferedReader = new BufferedReader(
-							new InputStreamReader(in, charset));
+							new InputStreamReader(in, "utf-8"));
 					String line = bufferedReader.readLine();
 					while (line != null) {
 						temp.append(line);
@@ -281,13 +259,8 @@ public class QHttpUtil {
 		}
 		
 	}
-    
-    /**
-     * @param url
-     * @return
-     * @throws IOException
-     */
-    private static HttpsURLConnection initHttpsConn(URL url) throws IOException {
+	
+	private static HttpsURLConnection initHttpsConn(URL url) throws IOException {
 		// Create a trust manager that does not validate certificate chains
 		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
 			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -319,5 +292,5 @@ public class QHttpUtil {
 		});
 	    return https;
 	}
-	
+
 }

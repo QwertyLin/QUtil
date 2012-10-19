@@ -48,10 +48,31 @@ public class HttpUtil {
 		});
     }
     
+    public static void getOnCurrentThread(final HttpEntity en){    
+    	QLog.kv(HttpUtil.class, "get", "path", en.getCacheFile().getPath());
+    	//
+    	if(en.getCacheFile().exists()){
+			if(en.getCacheTime() == -1 || en.getCacheTime() > Calendar.getInstance().getTimeInMillis() -  en.getCacheFile().lastModified()){
+				QLog.kv(HttpUtil.class, "checkCache", "cache available", true);
+				getSuccess(en);
+				return;
+			}
+    	}
+		QLog.kv(HttpUtil.class, "checkCache", "cache available", false);
+    	//
+		try {
+			getFile(en);
+			getSuccess(en);
+		} catch (IOException e) {
+			e.printStackTrace();
+			getError(en);
+		}
+    }
+    
     private static void getSuccess(HttpEntity en){
     	if(en.getListener().onHttpVerify(en)){
     		Message msg = HttpInstance.getInstance().getHandler().obtainMessage();
-    		msg.what = HttpInstance.SUCCESS;
+    		msg.what = HttpInstance.MSG_SUCCESS;
     		msg.obj = en;
     		HttpInstance.getInstance().getHandler().sendMessage(msg);
 		}else{

@@ -1,6 +1,5 @@
-package qv.list.more;
+package qv.list.autoMore;
 
-import android.os.Message;
 import android.view.View;
 import android.widget.ListView;
 
@@ -20,18 +19,14 @@ public class LvAutoMoreEntity {
 		this.viewFooter = viewFooter;
 	}
 	
-	public void setEnable(boolean isEnable) {
-		if(this.isEnable ^ isEnable){
-			this.isEnable = isEnable;
-			Message msg = LvAutoMoreInstance.getInstance().getHandler().obtainMessage();
-			if(isEnable){
-				msg.what = LvAutoMoreInstance.MSG_ENABLE;
-			}else{
-				msg.what = LvAutoMoreInstance.MSG_DISABLE;
-			}
-			msg.obj = this;
-			LvAutoMoreInstance.getInstance().getHandler().sendMessage(msg);
-		}
+	protected void setEnable(boolean isEnable) {
+		this.isEnable = isEnable;
+	}
+	protected void setViewFooter(View viewFooter) {
+		this.viewFooter = viewFooter;
+	}
+	protected void setDoing(boolean isDoing) {
+		this.isDoing = isDoing;
 	}
 	
 	public int getId() {
@@ -46,14 +41,8 @@ public class LvAutoMoreEntity {
 	public View getViewFooter() {
 		return viewFooter;
 	}
-	public void setViewFooter(View viewFooter) {
-		this.viewFooter = viewFooter;
-	}
 	public boolean isDoing() {
 		return isDoing;
-	}
-	public void setDoing(boolean isDoing) {
-		this.isDoing = isDoing;
 	}
 	public boolean isEnable() {
 		return isEnable;
