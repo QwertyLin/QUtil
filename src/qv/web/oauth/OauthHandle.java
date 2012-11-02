@@ -15,7 +15,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -24,75 +23,45 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import q.QLog;
-import android.graphics.Bitmap;
-import android.view.View;
-import android.webkit.CookieManager;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.content.Context;
+import android.os.Handler;
 
-public class WvOauthUtil {
+public abstract class OauthHandle {
+
+	public abstract int getType();
+	public abstract String getAuthUrl();
+	public abstract String getUrlParsePattern();
+	public abstract void parseUrl(final Context ctx, Matcher m, final OnOauthListener listener);
 	
-	public static final int 
-		TYPE_SINA_WEIBO = 1, //http://open.weibo.com/
-		TYPE_QQ_WEIBO = 2, //http://dev.t.qq.com/
-		TYPE_QQ_ZONE = 3, //http://opensns.qq.com/
-		TYPE_RENREN = 4;
-		
-	public static void init(final WvOauthEntity en){
-		WebSettings set = en.getWebView().getSettings();
-		set.setJavaScriptEnabled(true);
-		set.setSupportZoom(true);
-		set.setBuiltInZoomControls(true);
-		set.setCacheMode(WebSettings.LOAD_NO_CACHE);
-		//
-		en.getWebView().setWebChromeClient(new WebChromeClient(){
-			private boolean isLoadingFinish;
-			@Override
-			public void onProgressChanged(WebView view, int newProgress) {
-				if (!isLoadingFinish && newProgress > 30) {
-					isLoadingFinish = true;
-					en.getListener().onWvOauthLoadingFinish(en);
-				}
-			}
-		});
-		//get auth
-		WebViewClient wvc = new WebViewClient() {
-			int index = 0;
-			@Override
-			public void onPageStarted(WebView view, String url, Bitmap favicon) {
-				QLog.log(WvOauth.class, "url:" + url);
-				Pattern p = Pattern.compile(en.getHandle().getUrlParsePattern());
-				Matcher m = p.matcher(url);
-				if (m.find() && index == 0) {
-					index++;
-					en.getListener().onWvOauthAuthing(en);
-					CookieManager.getInstance().removeAllCookie();//clean cookie
-					en.getWebView().setVisibility(View.GONE);
-					en.getHandle().parseUrl(en, m);
-				}
-			}
-			@Override
-			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				QLog.log(WvOauth.class, "shouldOverrideUrlLoading url=" + url);
-				if(url.contains("error_uri")  //sina
-					|| url.contains("checkType=error") //QQ
-					|| url.contains("error=login_denied") //renren
-				){
-					return true;
-				}
-				return super.shouldOverrideUrlLoading(view, url);
+	protected static final int MSG_SUCCESS = 1, MSG_ERROR = 2;
+	
+	protected Handler mHandler = new Handler(){
+		public void handleMessage(android.os.Message msg) {
+			Holder holder = (Holder)msg.obj;
+			switch(msg.what){
+			case MSG_SUCCESS:
+				TokenSqilte sqlite = new TokenSqilte(holder.ctx);
+				sqlite.open(true);
+				sqlite.insert(holder.token);
+				sqlite.close();
+				holder.listener.onWvOauthSuccess(holder.token);
+				break;
+			case MSG_ERROR:
+				holder.listener.onWvOauthError();
+				break;
 			}
 		};
-		en.getWebView().setWebViewClient(wvc);
-		en.getWebView().loadUrl(en.getHandle().getAuthUrl());
+	};
+	
+	public class Holder {
+		public Context ctx;
+		public Token token;
+		public OnOauthListener listener;
 	}
 	
-	public static boolean isTokenExpire(WvOauthToken token){
+	public static boolean isTokenExpire(Token token){
 		long timeRemain = token.getExpireTime() - Calendar.getInstance().getTimeInMillis();
-		QLog.log(WvOauthUtil.class, "timeRemain:" + timeRemain + " expire:" + token.getExpireTime());
+		//QLog.log(OauthHandle.class, "timeRemain:" + timeRemain + " expire:" + token.getExpireTime());
 		if(timeRemain > 0){ //can be used
 			return false;
 		}else{ //can not be used
@@ -100,30 +69,7 @@ public class WvOauthUtil {
 		}
 	}
 	
-	protected static String md5(String str) {
-		MessageDigest md = null;
-		try {
-			md = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			return str;
-		}
-		md.update(str.getBytes());
-		byte b[] = md.digest();
-		int i;
-		StringBuffer buf = new StringBuffer("");
-		for (int offset = 0; offset < b.length; offset++) {
-			i = b[offset];
-			if (i < 0)
-				i += 256;
-			if (i < 16)
-				buf.append("0");
-			buf.append(Integer.toHexString(i));
-		}
-		return buf.toString();
-	}
-	
-	protected static String httpGet(String urlStr) throws IOException {
+	protected String httpGet(String urlStr) throws IOException {
     	HttpURLConnection conn = null;
     	InputStream in = null;
 		BufferedReader bufferedReader = null;
@@ -203,8 +149,8 @@ public class WvOauthUtil {
 					output.flush();
 				}
 			}else{
-				conn.setConnectTimeout(5000);//
-				conn.setReadTimeout(5000);// 
+				conn.setConnectTimeout(5000);
+				conn.setReadTimeout(5000);
 				conn.setRequestProperty("connection", "keep-alive");
 				conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);		
 				//conn.setRequestProperty("Host", "www.baidu.com");
@@ -292,5 +238,30 @@ public class WvOauthUtil {
 		});
 	    return https;
 	}
-
+	
+	protected static String md5(String str) {
+		MessageDigest md = null;
+		try {
+			md = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return str;
+		}
+		md.update(str.getBytes());
+		byte b[] = md.digest();
+		int i;
+		StringBuffer buf = new StringBuffer("");
+		for (int offset = 0; offset < b.length; offset++) {
+			i = b[offset];
+			if (i < 0)
+				i += 256;
+			if (i < 16)
+				buf.append("0");
+			buf.append(Integer.toHexString(i));
+		}
+		return buf.toString();
+	}
+	
 }
+
+

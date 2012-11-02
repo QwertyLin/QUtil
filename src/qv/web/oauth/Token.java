@@ -2,7 +2,7 @@ package qv.web.oauth;
 
 import java.io.Serializable;
 
-public class WvOauthToken implements Serializable {
+public class Token implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private int type;

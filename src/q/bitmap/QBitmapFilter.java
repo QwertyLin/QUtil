@@ -91,6 +91,25 @@ public class QBitmapFilter {
 		return newBm;
 	}
 	
+	public  static Bitmap roundCorner2(Bitmap cBitmap, int roundPx) {
+		Bitmap output = Bitmap.createBitmap(cBitmap.getWidth(),
+	    cBitmap.getHeight(), Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+         int color = 0xff424242;
+         Paint paint = new Paint();
+        Rect rect = new Rect(0, 0, cBitmap.getWidth(), cBitmap.getHeight());
+         RectF rectF = new RectF(rect);
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
+        canvas.drawBitmap(cBitmap, rect, rect, paint);
+        cBitmap.recycle();
+        cBitmap = null;
+        return output;
+    }
+	
 	/**
 	 * 加边框
 	 * @param bm
