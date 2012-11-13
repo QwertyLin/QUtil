@@ -91,6 +91,11 @@ public abstract class SqliteBase<T extends SqliteBase.ISqlite> extends SQLiteOpe
 			return null;
 		}
 	}
+	
+	public void empty(){
+		db.execSQL("DELETE FROM " + tableName);
+		db.execSQL("update sqlite_sequence set seq=0 where name='"+ tableName +"'");
+	}
 
 	/**
 	 	StringBuffer sb = new StringBuffer("CREATE TABLE clock (");

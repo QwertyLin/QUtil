@@ -1,71 +1,47 @@
 package qv.tab;
 
+import q.util.R;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TabHost;
-import android.widget.TabWidget;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 
-public abstract class QTabActivityBase extends TabActivity implements OnCheckedChangeListener {
+public abstract class TabActivityBase extends TabActivity implements OnCheckedChangeListener {
 	
 	private TabHost tabHost;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Intent[] intent = onInitIntent();
+		setContentView(R.layout.view_tabhost);
 		//
-		tabHost = new TabHost(this);
-		tabHost.setId(android.R.id.tabhost);
+		tabHost = getTabHost();
 		//
-		LinearLayout linear = new LinearLayout(this);
-		linear.setOrientation(LinearLayout.VERTICAL);
-		tabHost.addView(linear);
-		//
-		TabWidget tabwidget = new TabWidget(this);
-		tabwidget.setId(android.R.id.tabs);
-		tabwidget.setVisibility(View.GONE);
-		linear.addView(tabwidget);
-		//
-		if(getTabDirection(0, 1) == 0){
-			linear.addView(initRadioGroup(intent.length));
-			linear.addView(initFrameLayout());
-		}else{
-			linear.addView(initFrameLayout());
-			linear.addView(initRadioGroup(intent.length));
-		}
-		//
-		setContentView(tabHost);
-		//
+		Intent[] intent = initIntent();
 		for(int i = 0, size = intent.length; i < size; i++){
-			tabHost.addTab(tabHost.newTabSpec("").setIndicator("").setContent(intent[i]));
+			tabHost.addTab(tabHost.newTabSpec(String.valueOf(i))
+					.setIndicator(String.valueOf(i))
+					.setContent(intent[i]));
 		}
 		tabHost.setCurrentTab(0);
+		//
+		((FrameLayout)findViewById(R.id.tabhost_rg)).addView(initRadioGroup(intent.length));
 	}
 	
-	protected abstract Intent[] onInitIntent();
-	protected abstract void onInitRadioButton(RadioButton rbtn, int position);
-	protected abstract int getTabDirection(int top, int bottom);
+	protected abstract Intent[] initIntent();
+	protected abstract void initRadioButton(int position, RadioButton rbtn);
 	
 	@Override
 	public void onCheckedChanged(RadioGroup group, int checkedId) {
 		tabHost.setCurrentTab(checkedId);
-	}
-	
-	private FrameLayout initFrameLayout(){
-		FrameLayout frame = new FrameLayout(this);
-		frame.setId(android.R.id.tabcontent);
-		frame.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 1));
-		return frame;
 	}
 	
 	private RadioGroup initRadioGroup(int size){
@@ -86,7 +62,7 @@ public abstract class QTabActivityBase extends TabActivity implements OnCheckedC
 			rbtn.setButtonDrawable(rbtnDrawableNull);
 			rbtn.setGravity(Gravity.CENTER_HORIZONTAL);
 			rbtn.setPadding(0, 0, 0, 0);
-			onInitRadioButton(rbtn, i);
+			initRadioButton(i, rbtn);
 			rg.addView(rbtn);
 		}
 		rg.check(0);

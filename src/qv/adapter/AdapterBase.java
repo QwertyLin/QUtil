@@ -14,13 +14,13 @@ import android.widget.BaseAdapter;
  * @param <T> 数据荣容器的类型
  * @param <H> 布局容器的类型
  */
-public abstract class  QAdapterBase<T, H> extends BaseAdapter {
+public abstract class  AdapterBase<T, H> extends BaseAdapter {
 	
 	protected List<T> mDatas;
 	protected Context mCtx;
 	protected LayoutInflater mInflater;
 	
-	public QAdapterBase(Context ctx, List<T> datas) {
+	public AdapterBase(Context ctx, List<T> datas) {
 		this.mCtx = ctx;
 		this.mDatas =  datas;
 		this.mInflater = ((Activity)ctx).getLayoutInflater();
