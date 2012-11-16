@@ -17,8 +17,8 @@ public abstract class SqliteBase<T extends SqliteBase.ISqlite> extends SQLiteOpe
 		void setId(long id);
 	}
 	
-	private SQLiteDatabase db;
-	private String tableName;
+	protected SQLiteDatabase db;
+	protected String tableName;
 
 	public SqliteBase(Context context, String dbName, String tableName) {
 		super(context, dbName, null, 1);
@@ -99,7 +99,7 @@ public abstract class SqliteBase<T extends SqliteBase.ISqlite> extends SQLiteOpe
 
 	/**
 	 	StringBuffer sb = new StringBuffer("CREATE TABLE clock (");
-		sb.append("id LONG PRIMARY KEY,");
+		sb.append("id INTEGER PRIMARY KEY,");
 		sb.append("name TEXT,");
 		return sb.toString();
 	 * @return

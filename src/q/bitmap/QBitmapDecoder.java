@@ -127,7 +127,7 @@ public class QBitmapDecoder {
 		}
 		Bitmap temp = deLoose(file, width, height);
 		Bitmap bm = deInSize(temp, width, height);
-		QBitmapUtil.recycle(temp);
+		BitmapUtil.recycle(temp);
 		return bm;
 	}
 	
@@ -145,7 +145,7 @@ public class QBitmapDecoder {
 		}
 		Bitmap temp = deLoose(ctx, uri, width, height);
 		Bitmap bm = deInSize(temp, width, height);
-		QBitmapUtil.recycle(temp);
+		BitmapUtil.recycle(temp);
 		return bm;
 	}
 	

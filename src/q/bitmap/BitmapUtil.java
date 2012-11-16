@@ -1,6 +1,9 @@
 package q.bitmap;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -8,7 +11,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Bitmap.Config;
 import android.graphics.drawable.Drawable;
 
-public class QBitmapUtil {
+public class BitmapUtil {
 	
 	public static final String toString(Bitmap bm){
 		StringBuffer sb = new StringBuffer();
@@ -82,6 +85,17 @@ public class QBitmapUtil {
 		bitmap.compress(Bitmap.CompressFormat.PNG, 0, os);            
         byte[] array = os.toByteArray();
         return BitmapFactory.decodeByteArray(array, 0, array.length);
+	}
+	
+	public static final boolean save(Bitmap bitmap, String path) {
+		try {
+			FileOutputStream os = new FileOutputStream(path);
+			return bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
 	}
 	
 	

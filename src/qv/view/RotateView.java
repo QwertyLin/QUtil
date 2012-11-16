@@ -1,6 +1,8 @@
 package qv.view;
 
+import q.util.R;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.View;
@@ -16,12 +18,9 @@ public class RotateView extends View {
 	
 	public RotateView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		for(int i = 0, size = attrs.getAttributeCount(); i < size; i++){
-			if("rotation".equals(attrs.getAttributeName(i))){
-				this.rotation = attrs.getAttributeFloatValue(i, 0);
-				return;
-			}
-		}		
+		TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.qview);   
+		this.rotation = array.getFloat(R.styleable.qview_arg_float, 0);
+        array.recycle(); 		
 	}
 
 	/**
