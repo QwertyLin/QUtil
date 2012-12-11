@@ -1,8 +1,8 @@
-package q;
+package q.a0;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import q.util.QLog;
+import q.QLog;
 
 import android.content.Context;
 import android.os.Looper;

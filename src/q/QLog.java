@@ -1,8 +1,5 @@
 package q;
 
-
-import com.umeng.analytics.MobclickAgent;
-
 import android.content.Context;
 import android.util.Log;
 
@@ -12,7 +9,6 @@ public class QLog {
 	
 	public static void error(Context ctx, String error){
 		log(ctx, error);
-		MobclickAgent.reportError(ctx, error);
 	}
 	
 	public static void event(){

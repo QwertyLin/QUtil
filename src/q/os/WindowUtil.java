@@ -2,24 +2,89 @@ package q.os;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.util.DisplayMetrics;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class WindowUtil {
+public final class WindowUtil {
+		
+	/**
+	 * 获得屏幕宽度分辨率
+	 * @param ctx
+	 * @return
+	 */
+	public static final int getWidth(Context ctx){
+		if(nWidth == 0){
+			DisplayMetrics dm = new DisplayMetrics(); 
+			((WindowManager)ctx.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(dm);
+			nWidth = Math.min(dm.widthPixels, dm.heightPixels);
+		}
+		return nWidth;
+	}
+	private static int nWidth;
+	
 	
 	/**
-	 * dip转px
+	 * 获得屏幕高度分辨率
+	 * @param ctx
+	 * @return
 	 */
-	public static int dip2px(Context ctx, float dip){ 
-        return (int)(dip * WindowMgr.getInstance(ctx).getScale() + 0.5f); 
-	} 
+	public static final int getHeight(Context ctx){
+		if(nHeight == 0){
+			DisplayMetrics dm = new DisplayMetrics(); 
+			((WindowManager)ctx.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(dm);
+			nHeight = Math.max(dm.widthPixels, dm.heightPixels);
+		}
+		return nHeight;
+	}
+	private static int nHeight;
+		
+	/**
+	 * 获得屏幕密度，一般值为0.75、1、1.5。相当于getDensityDip()/160
+	 * @param ctx
+	 * @return
+	 */
+	public static final float getDensity(Context ctx){
+		if(nDensity == 0){
+			DisplayMetrics dm = new DisplayMetrics(); 
+			((WindowManager)ctx.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(dm);
+			nDensity = dm.density;
+		}
+		return nDensity;
+	}
+	private static float nDensity;
+		
+	/**
+	 * 获得屏幕密度dpi，一般值为120、160、240。
+	 * dpi：dots per inch。
+	 * drawable与hdpi,mdpi,ldpi的关系：densityDpi=120：ldpi、densityDpi=160：mdpi、densityDpi=240：hdpi
+	 * @param ctx
+	 * @return
+	 */
+	public static final int getDensityDpi(Context ctx) {
+		if(nDpi == 0){
+			DisplayMetrics dm = new DisplayMetrics(); 
+			((WindowManager)ctx.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(dm);
+			nDpi = dm.densityDpi;
+		}
+		return nDpi;
+	}
+	private static int nDpi;//密度DPI
+	
 	
 	/**
-	 * px转dip
+	 * 获得状态栏高度，需UI初始化结束后调用
+	 * @param contentView
+	 * @return
 	 */
-	public static int px2dip(Context ctx, float px){ 
-        return (int)(px / WindowMgr.getInstance(ctx).getScale() + 0.5f); 
-	} 
+	public static final int getStatusBarHeight(Activity act){
+		Rect rect= new Rect();
+		act.getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
+		return rect.top;
+	}
 	
 	/**
 	 * 设置为无标题栏，必须在setContentView之前调用
@@ -40,6 +105,29 @@ public class WindowUtil {
 	 */
 	public static final void setScreenKeepOn(Activity act){
 		act.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	}
+	
+	/**
+	 * 单位dip转px，当densityDpi=160时，1dip=1px。
+	 * dip:device independent pixels(设备独立像素)、sp: scaled pixels(放大像素)。
+	 * @param ctx
+	 * @param dip
+	 * @return
+	 */
+	public static int dip2px(Context ctx, float dip){
+        return (int)(dip * getDensity(ctx) + 0.5f);
+	} 
+	
+	/**
+	 * 截取屏幕，只限于APP自身
+	 * @param act
+	 * @return
+	 */
+	public static Bitmap captureScreen(Activity act) {
+		View decorview = act.getWindow().getDecorView();
+		decorview.setDrawingCacheEnabled(true);
+		//decorview.buildDrawingCache();
+		return decorview.getDrawingCache();
 	}
 
 }

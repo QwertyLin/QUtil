@@ -1,4 +1,4 @@
-package q;
+package q.a0;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -14,10 +14,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import q.util.QHttpUtil;
+import q.http.QHttpUtil;
 
-import cn.xxd.qr.R;
-import cn.xxd.qr.SettingA;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -38,7 +36,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.widget.RemoteViews;
 import android.widget.Toast;
-
+/*
 public class UpdateService extends Service {
 	
 	private static final String UPDATE_URL = "http://www.xxd.cn/update.php?v=";
@@ -233,7 +231,6 @@ private void Instanll(File file,Context context){
   context.startActivity(intent);     
 }   
 
-/*事件处理类*/
 class MyHandler extends Handler{
     private Context context;
     public MyHandler(Looper looper,Context c){
@@ -274,3 +271,4 @@ class MyHandler extends Handler{
          }
  }
 }
+*/
