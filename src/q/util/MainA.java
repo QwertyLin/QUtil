@@ -1,25 +1,11 @@
 package q.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
 import q.os.PowerUtil;
 import q.os.WindowUtil;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.Rect;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.SystemClock;
 import android.os.PowerManager.WakeLock;
-import android.util.Log;
-import android.view.Display;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 

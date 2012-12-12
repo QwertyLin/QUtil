@@ -129,5 +129,16 @@ public final class WindowUtil {
 		//decorview.buildDrawingCache();
 		return decorview.getDrawingCache();
 	}
+	
+	/**
+	 * 将View转换为Bitmap
+	 * @param view
+	 * @return
+	 */
+	public static Bitmap captureView(View view) {
+		view.setDrawingCacheEnabled(true);
+		//decorview.buildDrawingCache();
+		return view.getDrawingCache();
+	}
 
 }
