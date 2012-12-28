@@ -7,7 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import q.http.QHttpUtil;
+import q.http.HttpUtil;
 import android.content.Context;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
@@ -107,6 +107,6 @@ public class QTelephonyUtil {
 		}
 		//
 		System.out.println(json.toString());
-		return QHttpUtil.post("http://www.google.com/loc/json", json.toString());
+		return HttpUtil.post("http://www.google.com/loc/json", json.toString());
 	}
 }

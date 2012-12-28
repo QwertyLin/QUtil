@@ -15,7 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import q.code.CodeUtil;
-import q.http.QHttpUtil;
+import q.http.HttpUtil;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -383,7 +383,7 @@ public class QLayoutOauth extends RelativeLayout {
 			new Thread(){
 				public void run() {
 					try {
-						JSONObject json = new JSONObject(QHttpUtil.get(urlUsersShow(token)));
+						JSONObject json = new JSONObject(HttpUtil.get(urlUsersShow(token)));
 						token.setName(json.getString("screen_name"));
 						token.setPhoto(json.getString("profile_image_url"));
 						QLog.log(QLayoutOauth.class, "screen_name=" + token.getName() + " profile_image_url=" + token.getPhoto());
@@ -427,7 +427,7 @@ public class QLayoutOauth extends RelativeLayout {
 				param += "&lat=" + lat + "&long=" + lng;
 			}
 			//
-			return QHttpUtil.post("https://api.weibo.com/2/statuses/update.json", param);
+			return HttpUtil.post("https://api.weibo.com/2/statuses/update.json", param);
 		}
 		
 		public static String postPic(Token token, String text, String pic, String lat, String lng) throws IOException, UnAuthException{
@@ -465,7 +465,7 @@ public class QLayoutOauth extends RelativeLayout {
 			params.append("Content-Disposition: form-data; name=\"" + "pic" + "\"; filename=\"" + new File(pic).getName() + "\"\r\n");
 		    params.append("Content-Type: " + "image/x-png" + "\r\n\r\n");
 		    //
-			return QHttpUtil.post("https://upload.api.weibo.com/2/statuses/upload.json", params.toString(), "-----114975832116442893661388290519", pic);
+			return HttpUtil.post("https://upload.api.weibo.com/2/statuses/upload.json", params.toString(), "-----114975832116442893661388290519", pic);
 		}
 		
 		public static String urlUsersShow(Token token) {
@@ -527,7 +527,7 @@ public class QLayoutOauth extends RelativeLayout {
 			new Thread(){
 				public void run() {
 					try {
-						JSONObject json = new JSONObject(QHttpUtil.get(urlUserInfoSimple(token, token.getId())));
+						JSONObject json = new JSONObject(HttpUtil.get(urlUserInfoSimple(token, token.getId())));
 						json = json.getJSONObject("data").getJSONArray("info").getJSONObject(0);
 						token.setName(json.getString("nick"));
 						token.setPhoto(json.getString("head") + "/50");
@@ -568,7 +568,7 @@ public class QLayoutOauth extends RelativeLayout {
 					+ "&oauth_version=2.a"
 					+ "&format=json"
 					+ "&content=" + URLEncoder.encode(text, "utf-8");
-			return QHttpUtil.post("https://open.t.qq.com/api/t/add", param);
+			return HttpUtil.post("https://open.t.qq.com/api/t/add", param);
 		}
 		
 		public static String postPic(Token token, String text, String pic) throws IOException, UnAuthException{
@@ -611,7 +611,7 @@ public class QLayoutOauth extends RelativeLayout {
 			params.append("Content-Disposition: form-data; name=\"" + "pic" + "\"; filename=\"" + "pic.png" + "\"\r\n");
 	        params.append("Content-Type: " + "application/octet-stream" + "\r\n\r\n");
 	        //
-			return QHttpUtil.post("https://open.t.qq.com/api/t/add_pic", params.toString(), "-----114975832116442893661388290519", pic);
+			return HttpUtil.post("https://open.t.qq.com/api/t/add_pic", params.toString(), "-----114975832116442893661388290519", pic);
 		}
 		
 		public static String urlUserInfoSimple(Token token, String id) {
@@ -694,7 +694,7 @@ public class QLayoutOauth extends RelativeLayout {
 			new Thread(){
 				public void run() {
 					try {
-						String data = QHttpUtil.get("https://graph.qq.com/oauth2.0/me?access_token=" + token.getToken());
+						String data = HttpUtil.get("https://graph.qq.com/oauth2.0/me?access_token=" + token.getToken());
 						if(data != null){
 							String sep = "openid\":\"";
 							int startIndex = data.indexOf(sep) + sep.length(); 
@@ -707,7 +707,7 @@ public class QLayoutOauth extends RelativeLayout {
 							return;
 						}
 						//
-						JSONObject json = new JSONObject(QHttpUtil.get(urlUserInfo(token)));
+						JSONObject json = new JSONObject(HttpUtil.get(urlUserInfo(token)));
 						token.setName(json.getString("nickname"));
 						token.setPhoto(json.getString("figureurl_1"));
 						QLog.log(QLayoutOauth.class, "nickname=" + token.getName() + " figureurl_1=" + token.getPhoto());
@@ -746,7 +746,7 @@ public class QLayoutOauth extends RelativeLayout {
 					+ "&con=" + URLEncoder.encode(text, "utf-8")
 					+ "&third_source=1"
 					;
-			return QHttpUtil.post("https://graph.qq.com/shuoshuo/add_topic", param);
+			return HttpUtil.post("https://graph.qq.com/shuoshuo/add_topic", param);
 		}
 		
 		public static String postPic(Token token, String text, String pic) throws IOException, UnAuthException{
@@ -781,7 +781,7 @@ public class QLayoutOauth extends RelativeLayout {
 			params.append("Content-Disposition: form-data; name=\"" + "picture" + "\"; filename=\"" + "pic.png" + "\"\r\n");
 	        params.append("Content-Type: " + "image/x-png" + "\r\n\r\n");
 	        //
-			return QHttpUtil.post("https://graph.qq.com/photo/upload_pic", params.toString(), "-----114975832116442893661388290519", pic);
+			return HttpUtil.post("https://graph.qq.com/photo/upload_pic", params.toString(), "-----114975832116442893661388290519", pic);
 	    }
 		
 		public static String urlUserInfo(Token token) throws IOException, UnAuthException{
@@ -883,7 +883,7 @@ public class QLayoutOauth extends RelativeLayout {
 					+ "&method=users.getInfo"
 					+ "&v=1.0"
 					+ "&sig="+md5;
-			return QHttpUtil.post("http://api.renren.com/restserver.do", param);
+			return HttpUtil.post("http://api.renren.com/restserver.do", param);
 		}
 		
 		public static String postFriends(Token token) throws IOException, UnAuthException{
@@ -902,7 +902,7 @@ public class QLayoutOauth extends RelativeLayout {
 					+ "&method=" + "friends.getFriends"
 					+ "&v=1.0"
 					+ "&sig="+md5;
-			return QHttpUtil.post("http://api.renren.com/restserver.do", param);
+			return HttpUtil.post("http://api.renren.com/restserver.do", param);
 		}
 		
 		public static String postText(Token token, String text) throws UnAuthException, IOException {
@@ -922,7 +922,7 @@ public class QLayoutOauth extends RelativeLayout {
 					+ "&status="+URLEncoder.encode(text, "utf-8")
 					+ "&v=1.0"
 					+ "&sig="+md5;
-			return QHttpUtil.post("http://api.renren.com/restserver.do", param);
+			return HttpUtil.post("http://api.renren.com/restserver.do", param);
 		}
 		
 		public static String postPic(Token token, String text, String pic) throws IOException, UnAuthException{
@@ -974,7 +974,7 @@ public class QLayoutOauth extends RelativeLayout {
 			params.append("Content-Disposition: form-data; name=\"" + "upload" + "\"; filename=\"" + "pic.png" + "\"\r\n");
 	        params.append("Content-Type: " + "image/png" + "\r\n\r\n");
 	        //
-			return QHttpUtil.post("http://api.renren.com/restserver.do", params.toString(), "-----------------------------114975832116442893661388290519", pic);
+			return HttpUtil.post("http://api.renren.com/restserver.do", params.toString(), "-----------------------------114975832116442893661388290519", pic);
 	    }
 
 	}

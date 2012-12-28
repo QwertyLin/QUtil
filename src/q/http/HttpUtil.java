@@ -24,7 +24,7 @@ import javax.net.ssl.X509TrustManager;
 import q.QLog;
 
 
-public class QHttpUtil {
+public class HttpUtil {
 	
 	public static String toString(HttpURLConnection conn) throws IOException{
     	return "response " + 
@@ -74,7 +74,7 @@ public class QHttpUtil {
 			}
 			//
 			conn.setRequestMethod("GET");
-			QLog.log(QHttpUtil.class, toString(conn));
+			QLog.log(HttpUtil.class, toString(conn));
 			//
 			//Header
 			//urlConnection.setRequestProperty("Host", "www.baidu.com");
@@ -137,12 +137,12 @@ public class QHttpUtil {
 			}
 			//
 			conn.setRequestMethod("GET");
-			QLog.log(QHttpUtil.class, toString(conn));
+			QLog.log(HttpUtil.class, toString(conn));
 			//
 			if(conn.getResponseCode() == 200){
 				//文件大小不变时,不更新
 				if(isCheckExist && file.exists() && file.length() == conn.getContentLength()){
-					QLog.log(QHttpUtil.class, "文件无变化");
+					QLog.log(HttpUtil.class, "文件无变化");
 					return;
 				}
 				//
